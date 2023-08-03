@@ -10,12 +10,14 @@ using namespace ::testing;
 class MockCatalogue: public Catalogue {
   public:
     MOCK_METHOD (void, addProduct, (const Product &product), ());
+    MOCK_METHOD (void, addProductGroup, (const ProductGroup &productGroup), ());
 };
 
 TEST (TestSuperMarket, AddProductTest) {
   MockCatalogue mockCatalogue;
-  EXPECT_CALL (mockCatalogue, addProduct (Product ("MockProduct", 123u)));
-  AddProductCommand addProduct { "MockProduct", 123 };
+  Product mockProduct { "MockProduct", 123u };
+  EXPECT_CALL (mockCatalogue, addProduct (mockProduct));
+  Catalogue::AddProductCommand addProduct { mockProduct };
   addProduct.execute (mockCatalogue);
 };
 

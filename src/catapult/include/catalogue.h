@@ -15,9 +15,7 @@ class Product {
   public:
     Product (const std::string &name, const uint32_t &unitCost) noexcept: _name (name), _unitCost (unitCost) {};
 
-    bool operator== (const Product &other) const noexcept {
-      return other._name == _name && other._unitCost == _unitCost;
-    };
+    bool operator==(const Product&) const = default;
 
     friend std::ostream &operator<< (std::ostream &outStream, const Product &product);
 
@@ -29,21 +27,44 @@ class Product {
 std::ostream &operator<< (std::ostream &outStream, const Product &product);
 
 //! @brief represents a group of products
-class ProductGroup {};
+class ProductGroup {
+  public:
+    explicit ProductGroup(const std::string& name): _name(name) {};
+
+    bool operator==(const ProductGroup&) const = default;
+    friend std::ostream &operator<< (std::ostream &outStream, const ProductGroup &product);
+  private:
+    std::string _name;
+};
+
+std::ostream &operator<< (std::ostream &outStream, const ProductGroup &product);
 
 class Catalogue: public Receiver<Catalogue> {
   public:
+    class AddProductCommand;
+    class AddProductGroupCommand;
+
+  private:
     virtual void addProduct (const Product &product) = 0;
+    virtual void addProductGroup (const ProductGroup &productGroup) = 0;
 };
 
-class AddProductCommand: public Executable<Catalogue> {
+class Catalogue::AddProductCommand: public Executable<Catalogue> {
   public:
-    AddProductCommand (const std::string &name, const uint32_t &unitCost): _name (name), _unitCost (unitCost) {};
+    AddProductCommand (const Product& product): _product(product) {};
     void execute (Catalogue &catalogue) const override;
 
   private:
-    std::string _name;
-    uint32_t _unitCost;
+    Product _product;
+};
+
+class Catalogue::AddProductGroupCommand: public Executable<Catalogue> {
+  public:
+    AddProductGroupCommand (const ProductGroup& productGroup): _productGroup(productGroup) {};
+    void execute (Catalogue &catalogue) const override;
+
+  private:
+    ProductGroup _productGroup;
 };
 
 }  // namespace catapult

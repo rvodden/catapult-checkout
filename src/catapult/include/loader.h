@@ -25,44 +25,11 @@ class Parser {
     virtual std::vector<Record> parse (std::istream &data) const = 0;
 };
 
-template<class Receiever>
+template<class ReturnType>
 class Interpreter {
   public:
     virtual ~Interpreter() = default;
-    virtual CommandList<Receiever> interpret (const Record &record) const = 0;
-};
-
-/*! @brief combines a Loader, Parser and Interpreter to produce a list of commands
- * from a data source */
-template<class Receiver>
-class Importer {
-  public:
-    Importer (Loader *loader, Parser *parser, Interpreter<Receiver> *interpreter):
-      _loader ( loader ),
-      _parser ( parser ),
-      _interpreter ( interpreter ) {};
-
-    Importer (const Importer&) = delete;
-    Importer& operator=(Importer&) = delete;
-    virtual ~Importer() {};
-
-    [[nodiscard]] CommandList<Receiver> &import () const;
-
-  private:
-    std::unique_ptr<Loader> _loader;
-    std::unique_ptr<Parser> _parser;
-    std::unique_ptr<Interpreter<Receiver>> _interpreter;
-};
-
-template<class Receiver>
-[[nodiscard]] CommandList<Receiver> &Importer<Receiver>::import () const {
-  auto records = _parser->parse (_loader->load ());
-  auto &commandList = *new CommandList<Receiver> ();
-  for (const auto &record: records) {
-    auto recordCommandList = _interpreter->interpret (record);
-    commandList.splice(commandList.end(), recordCommandList);
-  }
-  return commandList;
+    virtual ReturnType interpret (const Record &record) const = 0;
 };
 
 //! @brief Takes data from a file and returns an istream of it

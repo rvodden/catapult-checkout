@@ -16,7 +16,7 @@ using namespace std::literals;
 using CSVTestDataType = std::pair<std::string, std::vector<std::vector<std::string>>>;
 
 class CSVTest: public ::testing::TestWithParam<CSVTestDataType> {
-    virtual void SetUp () override {
+    void SetUp () override {
       auto param = GetParam ();
       std::tie (input, expected) = param;
     }
@@ -68,38 +68,6 @@ TEST_F (TestFileLoader, FileTest) {
   std::stringstream sStream;
   sStream << underTest.load ().rdbuf ();
   EXPECT_EQ (sStream.str (), kTestData);
-}
-
-class UnderTestReceiver {};
-
-class MockLoader: public Loader {
-  public:
-    MOCK_METHOD (std::istream &, load, (), (const));
-};
-
-class MockParser: public Parser {
-  public:
-    MOCK_METHOD (std::vector<Record>, parse, (std::istream & data), (const));
-};
-
-class MockInterpreter: public Interpreter<UnderTestReceiver> {
-  public:
-    MOCK_METHOD (CommandList<UnderTestReceiver>, interpret, (const Record &record), (const));
-};
-
-TEST (TestImporter, ImporterTest) {
-  auto mockLoader = new MockLoader {};
-  auto mockParser = new MockParser {};
-  auto mockInterpreter = new MockInterpreter {};
-  Importer<UnderTestReceiver> importer { mockLoader, mockParser, mockInterpreter };
-
-  std::stringstream mockLoaderRetval { "Mock String" };
-  EXPECT_CALL (*mockLoader, load ()).WillOnce (ReturnRef ( mockLoaderRetval ));
-  EXPECT_CALL (*mockParser, parse).WillOnce(Return( std::vector<Record> { {"Hello!", "GoodBye!"}, { "Upstairs", "Downstairs"} } ));
-  EXPECT_CALL (*mockInterpreter, interpret( Record{"Hello!", "GoodBye!"})).Times(1);
-  EXPECT_CALL (*mockInterpreter, interpret( Record{"Upstairs", "Downstairs"})).Times(1);
-
-  std::ignore = importer.import();
 }
 
 }  // namespace catapult
