@@ -1,0 +1,72 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 26,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "hidden": true,
+            "name": "use_toolchain_file",
+            "toolchainFile": "/CMakeToolchain.txt"
+        },
+        {
+            "hidden": true,
+            "name": "generate_compile_commands",
+            "environment": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "hidden": true,
+            "name": "base_configuration",
+            "inherits": [
+                "use_toolchain_file",
+                "generate_compile_commands"
+            ],
+            "binaryDir": "${sourceDir}/build"
+        },
+        {
+            "displayName": "Ninja Multi-Config",
+            "name": "ninja-mc",
+            "description": "Use Ninja to generate a multiconfiguration output.",
+            "generator": "Ninja Multi-Config",
+            "environment": {
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release"
+            },
+            "inherits": [
+                "base_configuration"
+            ]
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "targets",
+            "configurePreset": "ninja-mc",
+            "hidden": true
+        },
+        {
+            "name": "ninja-mc-release-all",
+            "displayName": "Release",
+            "configuration": "Release",
+            "inherits": ["targets"]
+        },
+        {
+            "name": "ninja-mc-debug-all",
+            "displayName": "Debug",
+            "configuration": "Debug",
+            "inherits": ["targets"]
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "Google Tests",
+            "description": "The default test suite",
+            "configurePreset": "ninja-mc",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
+    ]
+}
