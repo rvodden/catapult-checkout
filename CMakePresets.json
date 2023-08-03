@@ -61,7 +61,8 @@
     ],
     "testPresets": [
         {
-            "name": "Google Tests",
+            "name": "unit-tests",
+            "displayName": "Unit Tests",
             "description": "The default test suite",
             "configurePreset": "ninja-mc",
             "output": {

@@ -1,0 +1,23 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    container:
+      image: rvodden/ha-dev:x86_64-pc-ubuntu-x11-gcc
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure
+        run: cmake --preset ninja-mc -S . -B build
+      - name: Build
+        run: cmake --build build --preset ninja-mc-debug-all
+      - name: Test
+        run: ctest --test-dir build
+
