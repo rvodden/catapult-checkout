@@ -10,4 +10,7 @@ void SuperMarket::addProduct (const Product &product) {
   _products.push_back(product);
 }
 
+void SuperMarket::addProductGroup (const ProductGroup &productGroup) {
+  _productGroups.push_back(productGroup);
+}
 }

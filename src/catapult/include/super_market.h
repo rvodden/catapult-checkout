@@ -15,6 +15,7 @@ class SuperMarket: public Catalogue {
 
   private:
     void addProduct (const Product &product) override;
+    void addProductGroup (const ProductGroup &productGroup) override;
     std::vector<Product> _products;
     std::vector<ProductGroup> _productGroups;
 };
