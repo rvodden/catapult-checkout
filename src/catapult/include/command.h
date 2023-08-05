@@ -3,28 +3,41 @@
 
 #include <list>
 #include <memory>
-
-class Command {
-  public:
-    virtual ~Command () = default;
-};
+#include <variant>
 
 template<class Receiver>
-class Executable: public Command {
+class Executable {
   public:
+    virtual ~Executable() = default;
     virtual void execute (Receiver &receiver) const = 0;
 };
 
-template<class Receiver>
-using CommandList = std::list<std::shared_ptr<Executable<Receiver>>>;
+template <class Interfaces>
+using CommandPointer = std::shared_ptr<Executable<Interfaces>>;
 
-template<class SubClass>
-class Receiver {
+template <class ...Interfaces>
+using CommandWrapper = std::variant<CommandPointer<Interfaces>...>;
+
+template<class ...Interfaces>
+using CommandList = std::list<CommandWrapper<Interfaces...>>;
+
+template<class Interface>
+class Receiver: virtual public Interface {
   public:
-    virtual ~Receiver () = default;
-    void applyCommandList (const CommandList<SubClass>& commandList) {
+    virtual ~Receiver() = default;
+    void applyCommand(const CommandPointer<Interface> &command) {
+      command->execute(*this);
+    }
+};
+
+template<class Interface, class ...Interfaces>
+class MultiReceiver: public Receiver<Interface>, public Receiver<Interfaces>... {
+  public:
+    using Receiver<Interface>::applyCommand;
+    using Receiver<Interfaces>::applyCommand...;
+    void applyCommandList (const CommandList<Interface, Interfaces...>& commandList) {
       for (const auto &command: commandList) {
-        command->execute (static_cast<SubClass&>(*this));
+        std::visit([=,this](auto& command){ this->applyCommand(command); }, command);
       };
     };
 };

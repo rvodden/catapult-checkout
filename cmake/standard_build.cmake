@@ -1,3 +1,4 @@
+include(cmake/doxygen.cmake)
 include(cmake/name_generation.cmake)
 
 function(get_sources Path Glob Role)
@@ -72,6 +73,11 @@ macro(addStaticAndSharedLibraryTargets)
     set(LibraryName ${LibraryName} PARENT_SCOPE)
     set(ObjectName ${ObjectName} PARENT_SCOPE)
     set(StaticName ${StaticName} PARENT_SCOPE)
+
+
+    # target_compile_options(${LibraryName} PRIVATE "$<$<CONFIG:DEBUG>:${HA_TARGET_DEBUG_OPTIONS}>")
+    # target_compile_options(${ObjectName} PRIVATE "$<$<CONFIG:DEBUG>:${HA_TARGET_DEBUG_OPTIONS}>")
+    # target_compile_options(${StaticName} PRIVATE "$<$<CONFIG:DEBUG>:${HA_TARGET_DEBUG_OPTIONS}>")
 
     set_property(TARGET ${LibraryName} PROPERTY POSITION_INDEPENDENT_CODE ON)
     set_property(TARGET ${ObjectName} PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -156,6 +162,7 @@ macro(addTestTarget)
 endmacro()
 
 macro(standard_build)
+    # set(HA_TARGET_DEBUG_OPTIONS -fsanitize=address -static-libasan)
     generateLibraryName(${CMAKE_CURRENT_SOURCE_DIR})
     generateObjectName(${CMAKE_CURRENT_SOURCE_DIR})
     generateStaticName(${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,5 +1,17 @@
 #include "catalogue.h"
 
+namespace std {
+
+std::size_t std::hash<catapult::Product>::operator() (const catapult::Product &product) const noexcept {
+  return std::hash<std::string> {}(product._name);
+}
+
+std::size_t std::hash<catapult::ProductGroup>::operator() (const catapult::ProductGroup &productGroup) const noexcept {
+  return std::hash<std::string> {}(productGroup._name);
+}
+
+}
+
 namespace catapult {
 
 void Catalogue::AddProductCommand::execute (Catalogue &catalogue) const {

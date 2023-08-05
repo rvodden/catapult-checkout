@@ -21,23 +21,25 @@ TEST (TestReverseCommand, ExecuteTest) {
   underTest.execute (receiver);
 }
 
-class UnderTestReceiver : public Receiver<UnderTestReceiver> {
-};
+class MockInterface {};
 
-class MockCommand : public Executable<UnderTestReceiver> {
+class MockReceiver: public Receiver<MockInterface> {};
+
+class UnderTestMultiReceiver : public MultiReceiver<MockInterface> {};
+
+class MockCommand : public Executable<MockInterface> {
   public:
-    using Executable<UnderTestReceiver>::execute;
-    MOCK_METHOD (void, execute, (UnderTestReceiver& receiver), (const override));
+    MOCK_METHOD (void, execute, (MockInterface& receiver), (const override));
 };
 
 TEST(TestReceiver, TestExecuteCommandList) {
   auto mockCommand1 = std::make_shared<MockCommand>();
   auto mockCommand2 = std::make_shared<MockCommand>();
-  CommandList<UnderTestReceiver> commandList {
+  CommandList<MockInterface> commandList {
     mockCommand1,
     mockCommand2
   };
-  UnderTestReceiver underTest;
+  UnderTestMultiReceiver underTest;
   EXPECT_CALL(*mockCommand1, execute);
   EXPECT_CALL(*mockCommand2, execute);
   underTest.applyCommandList(commandList);

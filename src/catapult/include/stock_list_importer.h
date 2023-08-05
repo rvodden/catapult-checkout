@@ -5,18 +5,20 @@
 #include <memory>
 #include <tuple>
 #include <unordered_map>
+#include <variant>
 
 #include "catalogue.h"
 #include "command.h"
+#include "inventory.h"
 #include "loader.h"
 
 namespace catapult {
 
-using InterpretedRecord = std::tuple<Product,ProductGroup>;
+using StockListRecord = std::tuple<Product,ProductGroup, uint32_t>;
 
-class InventoryInterpreter: public Interpreter<InterpretedRecord> {
+class StockListInterpreter: public Interpreter<StockListRecord> {
   public:
-    std::tuple<Product, ProductGroup> interpret (const Record &record) const override;
+    StockListRecord interpret (const Record &record) const override;
 
   private:
     enum class fields { kReference, kName, kUnitPrice, kProductGroup, kDealType, kQuantity };
@@ -27,29 +29,29 @@ class InventoryInterpreter: public Interpreter<InterpretedRecord> {
 
 /*! @brief combines a Loader, Parser and Interpreter to produce a list of commands
  * from a data source */
-class InventoryImporter {
+class StockListImporter {
   public:
-    InventoryImporter(Loader *loader, Parser *parser, Interpreter<InterpretedRecord> *interpreter):
+    StockListImporter(Loader *loader, Parser *parser, Interpreter<StockListRecord> *interpreter):
       _loader ( loader ),
       _parser ( parser ),
       _interpreter ( interpreter ) {};
 
-    InventoryImporter (const InventoryImporter&) = delete;
-    InventoryImporter& operator=(InventoryImporter&) = delete;
-    virtual ~InventoryImporter() {};
+    StockListImporter (const StockListImporter&) = delete;
+    StockListImporter& operator=(StockListImporter&) = delete;
+    virtual ~StockListImporter() {};
 
-    [[nodiscard]] CommandList<Catalogue> import () const;
+    [[nodiscard]] CommandList<Catalogue, Inventory> import () const;
 
   private:
     std::unique_ptr<Loader> _loader;
     std::unique_ptr<Parser> _parser;
-    std::unique_ptr<Interpreter<InterpretedRecord>> _interpreter;
+    std::unique_ptr<Interpreter<StockListRecord>> _interpreter;
 };
 
-class CSVFileInventoryImporter: public InventoryImporter {
+class CSVFileInventoryImporter: public StockListImporter {
   public:
     CSVFileInventoryImporter (const std::filesystem::path &path) noexcept:
-      InventoryImporter (new FileLoader (path), new CSVParser (), new InventoryInterpreter ()) {};
+      StockListImporter (new FileLoader (path), new CSVParser (), new StockListInterpreter ()) {};
 };
 
 }  // namespace catapult
