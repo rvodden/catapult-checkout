@@ -3,10 +3,30 @@
 
 #include <cmath>
 #include <cstdint>
+#include <functional>
 #include <ostream>
 #include <string>
 
 #include "command.h"
+
+namespace catapult {
+
+class Product;
+class ProductGroup;
+
+}
+
+template<>
+class std::hash<catapult::Product> {
+  public:
+    std::size_t operator()(const catapult::Product& product) const noexcept;
+};
+
+template<>
+class std::hash<catapult::ProductGroup> {
+  public:
+    std::size_t operator()(const catapult::ProductGroup& productGroup) const noexcept;
+};
 
 namespace catapult {
 
@@ -18,6 +38,7 @@ class Product {
     bool operator==(const Product&) const = default;
 
     friend std::ostream &operator<< (std::ostream &outStream, const Product &product);
+    friend std::size_t std::hash<Product>::operator()(const Product& product) const noexcept;
 
   private:
     std::string _name;
@@ -33,14 +54,17 @@ class ProductGroup {
 
     bool operator==(const ProductGroup&) const = default;
     friend std::ostream &operator<< (std::ostream &outStream, const ProductGroup &product);
+    friend std::size_t std::hash<ProductGroup>::operator()(const ProductGroup& group) const noexcept;
   private:
     std::string _name;
 };
 
 std::ostream &operator<< (std::ostream &outStream, const ProductGroup &product);
 
-class Catalogue: public Receiver<Catalogue> {
+//! @brief reprensents the products and groups of products which can be bought and sold
+class Catalogue {
   public:
+    virtual ~Catalogue() = default;
     class AddProductCommand;
     class AddProductGroupCommand;
 
@@ -68,5 +92,7 @@ class Catalogue::AddProductGroupCommand: public Executable<Catalogue> {
 };
 
 }  // namespace catapult
+
+
 
 #endif  // __CATALOGUE_H__

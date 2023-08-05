@@ -2,6 +2,13 @@
     "files.associations": {
         "*.tcc": "cpp",
         "format": "cpp",
-        "istream": "cpp"
-    }
+        "istream": "cpp",
+        "vector": "cpp",
+        "memory": "cpp",
+        "optional": "cpp",
+        "string_view": "cpp",
+        "system_error": "cpp",
+        "variant": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
 }

@@ -4,8 +4,8 @@ cmake_minimum_required(VERSION 3.26.4)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+project("Catapult Checkout" LANGUAGES CXX)
 include(cmake/standard_build.cmake)
-project(test_project LANGUAGES CXX)
 
 add_subdirectory(external)
 include(GoogleTest)

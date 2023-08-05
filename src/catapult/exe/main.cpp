@@ -2,9 +2,8 @@
 #include <cinttypes>
 #include <iostream>
 
-#include "catalogue.h"
-#include "inventory_importer.h"
 #include "super_market.h"
+#include "stock_list_importer.h"
 
 using namespace catapult;
 
