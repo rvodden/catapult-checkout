@@ -30,12 +30,17 @@ class Receiver: virtual public Interface {
     }
 };
 
+
+//! @brief Inheriting from the MultiInterface template allows class to receive commands from more than one interface.
 template<class Interface, class ...Interfaces>
 class MultiReceiver: public Receiver<Interface>, public Receiver<Interfaces>... {
   public:
     using Receiver<Interface>::applyCommand;
     using Receiver<Interfaces>::applyCommand...;
-    void applyCommandList (const CommandList<Interface, Interfaces...>& commandList) {
+
+    //! @brief dispatch commands to the appropriate `applyCommand` for each interface.
+    template<class SubInterface, class ...SubInterfaces>
+    void applyCommandList (const CommandList<SubInterface, SubInterfaces...>& commandList) {
       for (const auto &command: commandList) {
         std::visit([=,this](auto& command){ this->applyCommand(command); }, command);
       };
