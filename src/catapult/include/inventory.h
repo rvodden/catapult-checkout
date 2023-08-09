@@ -40,10 +40,11 @@ class Inventory {
 };
 
 //! Adds a quantity of product to the inventory on which it is executed;
-class Inventory::AddItemsCommand: public Command<Inventory> {
+class Inventory::AddItemsCommand: public UndoableCommand<Inventory> {
   public:
     AddItemsCommand(const Product& product, uint32_t quantity): _product(product), _quantity(quantity) {};
     void execute(Inventory& inventory) const override;
+    void undo(Inventory& inventory) const override;
 
   private:
     Product _product;
@@ -51,10 +52,11 @@ class Inventory::AddItemsCommand: public Command<Inventory> {
 };
 
 //! Removes a quantity of product to the inventory on which it is executed;
-class Inventory::RemoveItemsCommand: public Command<Inventory> {
+class Inventory::RemoveItemsCommand: public UndoableCommand<Inventory> {
   public:
     RemoveItemsCommand(const Product& product, uint32_t quantity): _product(product), _quantity(quantity) {};
     void execute(Inventory& inventory) const override;
+    void undo(Inventory& inventory) const override;
 
   private:
     Product _product;
