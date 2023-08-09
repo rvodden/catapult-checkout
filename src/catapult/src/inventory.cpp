@@ -10,9 +10,18 @@ void Inventory::AddItemsCommand::execute (Inventory& inventory) const {
   inventory.addItems(_product, _quantity);
 }
 
+void Inventory::AddItemsCommand::undo (Inventory& inventory) const {
+  inventory.removeItems(_product, _quantity);
+}
+
 void Inventory::RemoveItemsCommand::execute (Inventory& inventory) const {
   inventory.removeItems(_product, _quantity);
 }
+
+void Inventory::RemoveItemsCommand::undo (Inventory& inventory) const {
+  inventory.addItems(_product, _quantity);
+}
+
 
 void InventoryImpl::addItems (Product product, uint32_t quantity) {
   _inventory[product] += quantity;

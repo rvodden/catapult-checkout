@@ -22,12 +22,32 @@ TEST (TestInventory, TestAddProductCommand) {
   addItems.execute (mockInventory);
 };
 
+TEST (TestInventory, TestUndoAddProductCommand) {
+  MockInventory mockInventory {};
+  Product mockProduct { "MockProduct", 123u };
+  EXPECT_CALL (mockInventory, addItems (mockProduct, 123));
+  EXPECT_CALL (mockInventory, removeItems (mockProduct, 123));
+  Inventory::AddItemsCommand addItems { mockProduct, 123 };
+  addItems.execute (mockInventory);
+  addItems.undo (mockInventory);
+};
+
 TEST (TestInventory, TestRemoveProductCommand) {
   MockInventory mockInventory {};
   Product mockProduct { "MockProduct", 123u };
   EXPECT_CALL (mockInventory, removeItems (mockProduct, 123));
   Inventory::RemoveItemsCommand removeItems { mockProduct, 123 };
   removeItems.execute (mockInventory);
+};
+
+TEST (TestInventory, TestUndoRemoveProductCommand) {
+  MockInventory mockInventory {};
+  Product mockProduct { "MockProduct", 123u };
+  EXPECT_CALL (mockInventory, removeItems (mockProduct, 123));
+  EXPECT_CALL (mockInventory, addItems (mockProduct, 123));
+  Inventory::RemoveItemsCommand removeItems { mockProduct, 123 };
+  removeItems.execute (mockInventory);
+  removeItems.undo (mockInventory);
 };
 
 class InventoryTest: public InventoryImpl {
