@@ -20,6 +20,7 @@ class Inventory {
   public:
     virtual ~Inventory() = default;
     class AddItemsCommand;
+    class RemoveItemsCommand;
 
     //! @brief returns the quantity of product currently held in the inventory
     //! @param product the product
@@ -42,6 +43,17 @@ class Inventory {
 class Inventory::AddItemsCommand: public Command<Inventory> {
   public:
     AddItemsCommand(const Product& product, uint32_t quantity): _product(product), _quantity(quantity) {};
+    void execute(Inventory& inventory) const override;
+
+  private:
+    Product _product;
+    uint32_t _quantity;
+};
+
+//! Removes a quantity of product to the inventory on which it is executed;
+class Inventory::RemoveItemsCommand: public Command<Inventory> {
+  public:
+    RemoveItemsCommand(const Product& product, uint32_t quantity): _product(product), _quantity(quantity) {};
     void execute(Inventory& inventory) const override;
 
   private:
