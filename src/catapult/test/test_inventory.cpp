@@ -22,6 +22,14 @@ TEST (TestInventory, TestAddProductCommand) {
   addItems.execute (mockInventory);
 };
 
+TEST (TestInventory, TestRemoveProductCommand) {
+  MockInventory mockInventory {};
+  Product mockProduct { "MockProduct", 123u };
+  EXPECT_CALL (mockInventory, removeItems (mockProduct, 123));
+  Inventory::RemoveItemsCommand removeItems { mockProduct, 123 };
+  removeItems.execute (mockInventory);
+};
+
 class InventoryTest: public InventoryImpl {
     FRIEND_TEST (TestInventory, TestAddItemsAndGetQuantity);
     FRIEND_TEST (TestInventory, TestRemoveItems);
