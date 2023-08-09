@@ -73,7 +73,7 @@ class Catalogue {
     virtual void addProductGroup (const ProductGroup &productGroup) = 0;
 };
 
-class Catalogue::AddProductCommand: public Executable<Catalogue> {
+class Catalogue::AddProductCommand: public Command<Catalogue> {
   public:
     AddProductCommand (const Product& product): _product(product) {};
     void execute (Catalogue &catalogue) const override;
@@ -82,7 +82,7 @@ class Catalogue::AddProductCommand: public Executable<Catalogue> {
     Product _product;
 };
 
-class Catalogue::AddProductGroupCommand: public Executable<Catalogue> {
+class Catalogue::AddProductGroupCommand: public Command<Catalogue> {
   public:
     AddProductGroupCommand (const ProductGroup& productGroup): _productGroup(productGroup) {};
     void execute (Catalogue &catalogue) const override;

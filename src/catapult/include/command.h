@@ -3,48 +3,48 @@
 
 #include <list>
 #include <memory>
+#include <stack>
 #include <variant>
 
+namespace catapult {
+
 template<class Receiver>
-class Executable {
+class Command {
   public:
-    virtual ~Executable() = default;
+    virtual ~Command () = default;
     virtual void execute (Receiver &receiver) const = 0;
 };
 
-template <class Interfaces>
-using CommandPointer = std::shared_ptr<Executable<Interfaces>>;
+template<class Interfaces>
+using CommandPointer = std::shared_ptr<Command<Interfaces>>;
 
-template <class ...Interfaces>
+template<class... Interfaces>
 using CommandWrapper = std::variant<CommandPointer<Interfaces>...>;
 
-template<class ...Interfaces>
+//! @brief a std::list of commands each of which is targeted at one of `Interfaces`
+template<class... Interfaces>
 using CommandList = std::list<CommandWrapper<Interfaces...>>;
 
 template<class Interface>
 class Receiver: virtual public Interface {
   public:
-    virtual ~Receiver() = default;
-    void applyCommand(const CommandPointer<Interface> &command) {
-      command->execute(*this);
-    }
+    void applyCommand (const CommandPointer<Interface> &command) { command->execute (*this); }
 };
 
-
 //! @brief Inheriting from the MultiInterface template allows class to receive commands from more than one interface.
-template<class Interface, class ...Interfaces>
+template<class Interface, class... Interfaces>
 class MultiReceiver: public Receiver<Interface>, public Receiver<Interfaces>... {
   public:
     using Receiver<Interface>::applyCommand;
     using Receiver<Interfaces>::applyCommand...;
 
     //! @brief dispatch commands to the appropriate `applyCommand` for each interface.
-    template<class SubInterface, class ...SubInterfaces>
-    void applyCommandList (const CommandList<SubInterface, SubInterfaces...>& commandList) {
+    template<class SubInterface, class... SubInterfaces>
+    void applyCommandList (const CommandList<SubInterface, SubInterfaces...> &commandList) {
       for (const auto &command: commandList) {
-        std::visit([=,this](auto& command){ this->applyCommand(command); }, command);
+        std::visit ([=, this] (auto &command) { this->applyCommand (command); }, command);
       };
-    };
+    }
 };
 
 template<class Receiver>
@@ -55,7 +55,11 @@ class Undoable {
 };
 
 template<class Receiver>
-class ReverseCommand: public Executable<Receiver> {
+class UndoableCommand: public Command<Receiver>, public Undoable<Receiver> {
+};
+
+template<class Receiver>
+class ReverseCommand: public Command<Receiver> {
   public:
     ReverseCommand (Undoable<Receiver> *command): _command (command) {};
     ReverseCommand (const ReverseCommand &) = delete;
@@ -67,5 +71,14 @@ class ReverseCommand: public Executable<Receiver> {
   private:
     std::shared_ptr<Undoable<Receiver>> _command;
 };
+
+template<class ...Interfaces>
+class Transaction {
+  public:
+    template<class Interface>
+    Transaction& addCommand(Interface&, UndoableCommand<Interface>);
+};
+
+}
 
 #endif

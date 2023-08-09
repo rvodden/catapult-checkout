@@ -2,8 +2,8 @@
 #include <cinttypes>
 #include <iostream>
 
-#include "super_market.h"
 #include "stock_list_importer.h"
+#include "super_market.h"
 
 using namespace catapult;
 

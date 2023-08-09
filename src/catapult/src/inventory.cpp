@@ -12,7 +12,13 @@ void Inventory::AddItemsCommand::execute (Inventory& inventory) const {
 
 void InventoryImpl::addItems (Product product, uint32_t quantity) {
   _inventory[product] += quantity;
-};
+}
+
+void InventoryImpl::removeItems (Product product, uint32_t quantity) {
+  bool inStock = _inventory[product] > quantity;
+  if(!inStock) throw OutOfStockException(product);
+  _inventory[product] -= quantity;
+}
 
 uint32_t InventoryImpl::getQuantity(Product product) const {
   try {
