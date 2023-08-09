@@ -8,9 +8,14 @@
 
 namespace catapult
 {
-  class SuperMarket: public InventoryImpl, CatalogueImpl, public MultiReceiver<Catalogue, Inventory> {
+class SuperMarket: public InventoryImpl, CatalogueImpl, public MultiReceiver<Catalogue, Inventory> {
 
-  };
+};
+
+class Basket: public InventoryImpl, public MultiReceiver<Inventory> {
+
+};
+
 } // namespace catapul
 
 

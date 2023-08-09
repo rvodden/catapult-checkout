@@ -23,6 +23,7 @@ class MockStockHolder: public MultiReceiver<Catalogue, Inventory> {
     MOCK_METHOD (void, addProduct, (const Product &), (override));
     MOCK_METHOD (void, addProductGroup, (const ProductGroup &), (override));
     MOCK_METHOD (void, addItems, (Product, uint32_t quantity), (override));
+    MOCK_METHOD (void, removeItems, (Product, uint32_t quantity), (override));
     MOCK_METHOD (uint32_t, getQuantity, (Product), (const override));
 };
 
