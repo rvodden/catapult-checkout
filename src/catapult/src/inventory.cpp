@@ -7,7 +7,7 @@ namespace catapult
 {
 
 void Inventory::AddItemsCommand::_execute (Inventory& inventory) const {
-  inventory.addItems(_product, _quantity);
+  inventory._addItems(_product, _quantity);
 }
 
 void Inventory::AddItemsCommand::undo (Inventory& inventory) const {
@@ -19,11 +19,11 @@ void Inventory::RemoveItemsCommand::_execute (Inventory& inventory) const {
 }
 
 void Inventory::RemoveItemsCommand::undo (Inventory& inventory) const {
-  inventory.addItems(_product, _quantity);
+  inventory._addItems(_product, _quantity);
 }
 
 
-void InventoryImpl::addItems (Product product, uint32_t quantity) {
+void InventoryImpl::_addItems (Product product, uint32_t quantity) {
   _inventory[product] += quantity;
 }
 

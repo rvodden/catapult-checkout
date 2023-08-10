@@ -22,7 +22,7 @@ class MockStockHolder: public MultiReceiver<Catalogue, Inventory> {
   public:
     MOCK_METHOD (void, _addProduct, (const Product &), (override));
     MOCK_METHOD (void, _addProductGroup, (const ProductGroup &), (override));
-    MOCK_METHOD (void, addItems, (Product, uint32_t quantity), (override));
+    MOCK_METHOD (void, _addItems, (Product, uint32_t quantity), (override));
     MOCK_METHOD (void, removeItems, (Product, uint32_t quantity), (override));
     MOCK_METHOD (uint32_t, getQuantity, (Product), (const override));
 };
@@ -87,9 +87,9 @@ TEST_F (TestCSVFileInventoryImporter, TestCSVFileInventoryImporter) {
   EXPECT_CALL (mockStockHolder, _addProduct (Product ("Milk", 250)));
   EXPECT_CALL (mockStockHolder, _addProductGroup (ProductGroup ("Fruit")));
   EXPECT_CALL (mockStockHolder, _addProductGroup (ProductGroup ("Dairy")));
-  EXPECT_CALL (mockStockHolder, addItems (Product ("Apple", 100),100));
-  EXPECT_CALL (mockStockHolder, addItems (Product ("Banana", 50),150));
-  EXPECT_CALL (mockStockHolder, addItems (Product ("Milk", 250),200));
+  EXPECT_CALL (mockStockHolder, _addItems (Product ("Apple", 100),100));
+  EXPECT_CALL (mockStockHolder, _addItems (Product ("Banana", 50),150));
+  EXPECT_CALL (mockStockHolder, _addItems (Product ("Milk", 250),200));
 
   CSVFileInventoryImporter underTest { _path };
   auto commandList = underTest.import ();
