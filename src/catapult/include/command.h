@@ -11,6 +11,13 @@
 
 namespace catapult {
 
+class UnboundCommandException: public CatapultException {
+  public:
+    UnboundCommandException ():
+      CatapultException ("The command is not bound to an interface implementation") {};
+    // TODO: link to command which broke.
+};
+
 template<class Interface>
 class Command {
   public:
@@ -20,7 +27,7 @@ class Command {
       _execute (interface);
     };
 
-    void execute () { execute (*getTarget ()); };
+    void execute () { execute (*_getTarget ()); };
 
     //! @brief associates the command with an interface instance, but does not execute it.
     void bind (Interface &interface) { _interface = &interface; }
@@ -28,9 +35,9 @@ class Command {
 
   protected:
     //! @brief returns a pointer to
-    Interface *getTarget () {
+    Interface *_getTarget () const {
       if (_interface == nullptr) {
-        throw UnboundCommandException (*this);
+        throw UnboundCommandException();
       }
       return _interface;
     }
@@ -49,6 +56,31 @@ using CommandWrapper = std::variant<CommandPointer<Interfaces>...>;
 //! @brief a std::list of commands each of which is targeted at one of `Interfaces`
 template<class... Interfaces>
 using CommandList = std::list<CommandWrapper<Interfaces...>>;
+
+template<class Interface>
+class Undoable {
+  public:
+    virtual ~Undoable () = default;
+    virtual void undo (Interface &receiver) const = 0;
+};
+
+template<class Interface>
+class UndoableCommand: public Command<Interface>, public Undoable<Interface> {
+  public:
+    using Undoable<Interface>::undo;
+    void undo () const { undo (*Command<Interface>::_getTarget ()); }
+};
+
+template<class Interfaces>
+using UndoableCommandPointer = std::shared_ptr<UndoableCommand<Interfaces>>;
+
+
+template<class... Interfaces>
+using UndoableCommandWrapper = std::variant<UndoableCommandPointer<Interfaces>...>;
+
+//! @brief a std::list of commands each of which is targeted at one of `Interfaces`
+template<class... Interfaces>
+using UnoableCommandList = std::list<UndoableCommandWrapper<Interfaces...>>;
 
 template<class Interface>
 class Receiver: virtual public Interface {
@@ -72,19 +104,6 @@ class MultiReceiver: public Receiver<Interface>, public Receiver<Interfaces>... 
     }
 };
 
-template<class Interface>
-class Undoable {
-  public:
-    virtual ~Undoable () = default;
-    virtual void undo (Interface &receiver) const = 0;
-};
-
-template<class Interface>
-class UndoableCommand: public Command<Interface>, public Undoable<Interface> {
-  public:
-    using Undoable<Interface>::undo;
-    void undo () const { undo (*Command<Interface>::getTarget ()); }
-};
 
 template<class Interface>
 class ReverseCommand: public Command<Interface> {
@@ -100,42 +119,46 @@ class ReverseCommand: public Command<Interface> {
     std::shared_ptr<Undoable<Interface>> _command;
 };
 
-template<class Interface>
-class UnboundCommandException: public CatapultException {
-  public:
-    UnboundCommandException (const Command<Interface> &command):
-      CatapultException ("The command is not bound to an interface implementation"), _command { command } {};
-
-  private:
-    Command<Interface> _command;
-};
-
 template<class... Interfaces>
 class Transaction {
   public:
-    template<class Interface>
-    Transaction<Interfaces...> &then (UndoableCommand<Interface> command) {
-      if (!command.isBound ()) {
-        throw UnboundCommandException (command);
+    ~Transaction() {
+      while(!_beenRun.empty()) {
+        std::visit( [](const auto& command){ command->undo(); }, _beenRun.top());
+        _beenRun.pop();
       }
-      _stack.push (command);
     }
 
     template<class Interface>
-    Transaction<Interfaces...> &then (Interface &interface, UndoableCommand<Interface> command) {
-      command.bind (interface);
-      then (command);
+    Transaction<Interfaces...> &then (UndoableCommandPointer<Interface> command) {
+      if (!command->isBound ()) {
+        throw UnboundCommandException();
+      }
+      _toRun.push (command);
+      return *this;
+    }
+
+    template<class Interface>
+    Transaction<Interfaces...> &then (Interface &interface, UndoableCommandPointer<Interface> command) {
+      command->bind (interface);
+      return then (command);
     }
 
     void execute ();
 
   private:
-    std::stack<CommandWrapper<Interfaces...>> _stack;
+    std::stack<UndoableCommandWrapper<Interfaces...>> _toRun;
+    std::stack<UndoableCommandWrapper<Interfaces...>> _beenRun;
 };
 
 template<class... Interfaces>
 void Transaction<Interfaces...>::execute () {
-
+  while(!_toRun.empty()) {
+    auto command = _toRun.top();
+    std::visit( [](const auto& command){ command->execute(); }, command);
+    _beenRun.push(command);
+    _toRun.pop();
+  }
 };
 
 }
