@@ -11,11 +11,11 @@ void Inventory::AddItemsCommand::_execute (Inventory& inventory) const {
 }
 
 void Inventory::AddItemsCommand::undo (Inventory& inventory) const {
-  inventory.removeItems(_product, _quantity);
+  inventory._removeItems(_product, _quantity);
 }
 
 void Inventory::RemoveItemsCommand::_execute (Inventory& inventory) const {
-  inventory.removeItems(_product, _quantity);
+  inventory._removeItems(_product, _quantity);
 }
 
 void Inventory::RemoveItemsCommand::undo (Inventory& inventory) const {
@@ -27,7 +27,7 @@ void InventoryImpl::_addItems (Product product, uint32_t quantity) {
   _inventory[product] += quantity;
 }
 
-void InventoryImpl::removeItems (Product product, uint32_t quantity) {
+void InventoryImpl::_removeItems (Product product, uint32_t quantity) {
   bool inStock = _inventory[product] > quantity;
   if(!inStock) throw OutOfStockException(product);
   _inventory[product] -= quantity;

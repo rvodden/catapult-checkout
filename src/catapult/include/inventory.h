@@ -36,7 +36,7 @@ class Inventory {
     //! @brief remove a quatity of product to the inventory
     //! @param product the product to add
     //! @param quantity the quantity to add
-    virtual void removeItems(Product product, uint32_t quantity) = 0;
+    virtual void _removeItems(Product product, uint32_t quantity) = 0;
 };
 
 //! Adds a quantity of product to the inventory on which it is executed;
@@ -70,7 +70,7 @@ class InventoryImpl: virtual public Inventory {
 
   protected:
     void _addItems(Product product, uint32_t quantity) override;
-    void removeItems(Product product, uint32_t quantity) override;
+    void _removeItems(Product product, uint32_t quantity) override;
 
   private:
     std::unordered_map<Product, uint32_t> _inventory;

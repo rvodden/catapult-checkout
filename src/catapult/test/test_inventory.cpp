@@ -10,7 +10,7 @@ using namespace ::testing;
 class MockInventory: public Inventory {
   public:
     MOCK_METHOD (void, _addItems, (Product product, uint32_t Quantity), ());
-    MOCK_METHOD (void, removeItems, (Product product, uint32_t Quantity), ());
+    MOCK_METHOD (void, _removeItems, (Product product, uint32_t Quantity), ());
     MOCK_METHOD (uint32_t, getQuantity, (Product product), (const));
 };
 
@@ -26,7 +26,7 @@ TEST (TestInventory, TestUndoAddProductCommand) {
   MockInventory mockInventory {};
   Product mockProduct { "MockProduct", 123u };
   EXPECT_CALL (mockInventory, _addItems (mockProduct, 123));
-  EXPECT_CALL (mockInventory, removeItems (mockProduct, 123));
+  EXPECT_CALL (mockInventory, _removeItems (mockProduct, 123));
   Inventory::AddItemsCommand addItems { mockProduct, 123 };
   addItems.execute (mockInventory);
   addItems.undo (mockInventory);
@@ -35,7 +35,7 @@ TEST (TestInventory, TestUndoAddProductCommand) {
 TEST (TestInventory, TestRemoveProductCommand) {
   MockInventory mockInventory {};
   Product mockProduct { "MockProduct", 123u };
-  EXPECT_CALL (mockInventory, removeItems (mockProduct, 123));
+  EXPECT_CALL (mockInventory, _removeItems (mockProduct, 123));
   Inventory::RemoveItemsCommand removeItems { mockProduct, 123 };
   removeItems.execute (mockInventory);
 };
@@ -43,7 +43,7 @@ TEST (TestInventory, TestRemoveProductCommand) {
 TEST (TestInventory, TestUndoRemoveProductCommand) {
   MockInventory mockInventory {};
   Product mockProduct { "MockProduct", 123u };
-  EXPECT_CALL (mockInventory, removeItems (mockProduct, 123));
+  EXPECT_CALL (mockInventory, _removeItems (mockProduct, 123));
   EXPECT_CALL (mockInventory, _addItems (mockProduct, 123));
   Inventory::RemoveItemsCommand removeItems { mockProduct, 123 };
   removeItems.execute (mockInventory);
@@ -73,7 +73,7 @@ TEST (TestInventory, TestRemoveItems) {
   InventoryTest underTest;
   Product mockProduct ("MockProduct", 123);
   underTest._addItems (mockProduct, 234);
-  underTest.removeItems (mockProduct, 123);
+  underTest._removeItems (mockProduct, 123);
   EXPECT_EQ (111, underTest.getQuantity (mockProduct));
 }
 
@@ -82,7 +82,7 @@ TEST (TestInventory, TestRemoveItemsThrowsWhenItemIsOutOfStock) {
   Product mockProduct ("MockProduct", 123);
   underTest._addItems (mockProduct, 123);
   EXPECT_THAT (
-    [&] () { underTest.removeItems (mockProduct, 234); },
+    [&] () { underTest._removeItems (mockProduct, 234); },
 
     Throws<OutOfStockException> (Field (&OutOfStockException::product, Eq (mockProduct)))
   );

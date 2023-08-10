@@ -22,13 +22,13 @@ class MockInterface {
     std::string _name;
 };
 
-class MockCommand: public Command<MockInterface> {
+class MockBindableCommand: public BindableCommand<MockInterface> {
   public:
     MOCK_METHOD (void, _execute, (MockInterface & receiver), (const override));
 };
 
-TEST (TestCommand, TestExecutionOfBoundCommand) {
-  MockCommand mockCommand;
+TEST (TestBindableCommand, TestExecutionOfBoundCommand) {
+  MockBindableCommand mockCommand;
   MockInterface interface {
       "Interface"
   };
@@ -37,16 +37,6 @@ TEST (TestCommand, TestExecutionOfBoundCommand) {
   mockCommand.bind (interface);
   EXPECT_THAT (mockCommand.isBound (), IsTrue ());
   mockCommand.execute (interface);
-}
-
-TEST (TestCommand, TestExecuteBindsCommand) {
-  MockCommand mockCommand;
-  MockInterface interface {
-      "Interface"
-  };
-  EXPECT_THAT (mockCommand.isBound (), IsFalse ());
-  mockCommand.execute (interface);
-  EXPECT_THAT (mockCommand.isBound (), IsTrue ());
 }
 
 TEST (TestReverseCommand, TestExecute) {
@@ -94,42 +84,42 @@ TEST (TestMultiReceiver, TestExecuteCommandListAimedAtASubsetOfInterfaces) {
   underTest.applyCommandList (commandList);
 }
 
-class MockUndoableCommand1: public UndoableCommand<MockInterface1> {
+class MockUndoableBindableCommand1: public UndoableBindableCommand<MockInterface1> {
   public:
     MOCK_METHOD (void, _execute, (MockInterface1 & interface), (const override));
     MOCK_METHOD (void, undo, (MockInterface1 & interface), (const override));
 };
 
-class MockUndoableCommand2: public UndoableCommand<MockInterface2> {
+class MockUndoableBindableCommand2: public UndoableBindableCommand<MockInterface2> {
   public:
     MOCK_METHOD (void, _execute, (MockInterface2 & interface), (const override));
     MOCK_METHOD (void, undo, (MockInterface2 & interface), (const override));
 };
 
 TEST (TestTransact, TestAList) {
-  auto mockUndoableCommand1 = std::make_shared<MockUndoableCommand1> ();
-  auto mockUndoableCommand2 = std::make_shared<MockUndoableCommand2> ();
+  auto mockUndoableBindableCommand1 = std::make_shared<MockUndoableBindableCommand1> ();
+  auto mockUndoableBindableCommand2 = std::make_shared<MockUndoableBindableCommand2> ();
   MockInterface1 mockInterface1;
   MockInterface2 mockInterface2;
 
-  EXPECT_CALL (*mockUndoableCommand1, _execute);
-  EXPECT_CALL (*mockUndoableCommand2, _execute);
+  EXPECT_CALL (*mockUndoableBindableCommand1, _execute);
+  EXPECT_CALL (*mockUndoableBindableCommand2, _execute);
   Transaction<MockInterface1, MockInterface2> transaction {};
-  transaction.then<MockInterface1> (mockInterface1, mockUndoableCommand1)
-    .then<MockInterface2> (mockInterface2, mockUndoableCommand2)
+  transaction.then<MockInterface1> (mockInterface1, mockUndoableBindableCommand1)
+    .then<MockInterface2> (mockInterface2, mockUndoableBindableCommand2)
     .execute ();
 }
 
-class MockUndoableCommand3: public UndoableCommand<MockInterface2> {
+class MockUndoableBindableCommand3: public UndoableBindableCommand<MockInterface2> {
   public:
     MOCK_METHOD (void, _execute, (MockInterface2 & interface), (const override));
     MOCK_METHOD (void, undo, (MockInterface2 & interface), (const override));
 };
 
 TEST (TestTransact, TestAListIsRolledBackWhenOneThrows) {
-  auto mockUndoableCommand1 = std::make_shared<MockUndoableCommand1> ();
-  auto mockUndoableCommand2 = std::make_shared<MockUndoableCommand2> ();
-  auto mockUndoableCommand3 = std::make_shared<MockUndoableCommand3> ();
+  auto mockUndoableCommand1 = std::make_shared<MockUndoableBindableCommand1> ();
+  auto mockUndoableCommand2 = std::make_shared<MockUndoableBindableCommand2> ();
+  auto mockUndoableCommand3 = std::make_shared<MockUndoableBindableCommand3> ();
   MockInterface1 mockInterface1;
   MockInterface2 mockInterface2;
 
