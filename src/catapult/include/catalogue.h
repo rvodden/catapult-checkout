@@ -69,25 +69,25 @@ class Catalogue {
     class AddProductGroupCommand;
 
   private:
-    virtual void addProduct (const Product &product) = 0;
-    virtual void addProductGroup (const ProductGroup &productGroup) = 0;
+    virtual void _addProduct (const Product &product) = 0;
+    virtual void _addProductGroup (const ProductGroup &productGroup) = 0;
 };
 
 class Catalogue::AddProductCommand: public Command<Catalogue> {
   public:
     AddProductCommand (const Product& product): _product(product) {};
-    void execute (Catalogue &catalogue) const override;
 
   private:
+    void _execute (Catalogue &catalogue) const override;
     Product _product;
 };
 
 class Catalogue::AddProductGroupCommand: public Command<Catalogue> {
   public:
     AddProductGroupCommand (const ProductGroup& productGroup): _productGroup(productGroup) {};
-    void execute (Catalogue &catalogue) const override;
 
   private:
+    void _execute (Catalogue &catalogue) const override;
     ProductGroup _productGroup;
 };
 

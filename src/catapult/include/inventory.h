@@ -43,10 +43,10 @@ class Inventory {
 class Inventory::AddItemsCommand: public UndoableCommand<Inventory> {
   public:
     AddItemsCommand(const Product& product, uint32_t quantity): _product(product), _quantity(quantity) {};
-    void execute(Inventory& inventory) const override;
     void undo(Inventory& inventory) const override;
 
   private:
+    void _execute(Inventory& inventory) const override;
     Product _product;
     uint32_t _quantity;
 };
@@ -55,10 +55,10 @@ class Inventory::AddItemsCommand: public UndoableCommand<Inventory> {
 class Inventory::RemoveItemsCommand: public UndoableCommand<Inventory> {
   public:
     RemoveItemsCommand(const Product& product, uint32_t quantity): _product(product), _quantity(quantity) {};
-    void execute(Inventory& inventory) const override;
     void undo(Inventory& inventory) const override;
 
   private:
+    void _execute(Inventory& inventory) const override;
     Product _product;
     uint32_t _quantity;
 };

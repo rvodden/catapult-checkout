@@ -9,14 +9,14 @@ using namespace ::testing;
 
 class MockCatalogue: public Catalogue {
   public:
-    MOCK_METHOD (void, addProduct, (const Product &product), ());
-    MOCK_METHOD (void, addProductGroup, (const ProductGroup &productGroup), ());
+    MOCK_METHOD (void, _addProduct, (const Product &product), ());
+    MOCK_METHOD (void, _addProductGroup, (const ProductGroup &productGroup), ());
 };
 
 TEST (TestSuperMarket, TestAddProductCommand) {
   MockCatalogue mockCatalogue;
   Product mockProduct { "MockProduct", 123u };
-  EXPECT_CALL (mockCatalogue, addProduct (mockProduct));
+  EXPECT_CALL (mockCatalogue, _addProduct (mockProduct));
   Catalogue::AddProductCommand addProduct { mockProduct };
   addProduct.execute (mockCatalogue);
 };
@@ -24,7 +24,7 @@ TEST (TestSuperMarket, TestAddProductCommand) {
 TEST (TestSuperMarket, AddTestAddProductGroupCommand) {
   MockCatalogue mockCatalogue;
   ProductGroup mockProductGroup { "MockProductGroup" };
-  EXPECT_CALL (mockCatalogue, addProductGroup (mockProductGroup));
+  EXPECT_CALL (mockCatalogue, _addProductGroup (mockProductGroup));
   Catalogue::AddProductGroupCommand addProductGroup { mockProductGroup };
   addProductGroup.execute (mockCatalogue);
 };
