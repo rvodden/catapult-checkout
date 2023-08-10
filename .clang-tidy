@@ -24,6 +24,9 @@ CheckOptions:
   readability-identifier-naming.NamespaceCase: lower_case
   readability-identifier-naming.ClassCase: CamelCase
   readability-identifier-naming.PrivateMemberPrefix: _
+  readability-identifier-naming.PrivateMemberCase: camelBack
+  readability-identifier-naming.PrivateMethodPrefix: _
+  readability-identifier-naming.PrivateMethodCase: camelBack
   readability-identifier-naming.StructCase: CamelCase
   readability-identifier-naming.FunctionCase: camelBack
   readability-identifier-naming.VariableCase: camelBack

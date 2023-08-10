@@ -6,7 +6,7 @@
 namespace catapult
 {
 
-void Inventory::AddItemsCommand::execute (Inventory& inventory) const {
+void Inventory::AddItemsCommand::_execute (Inventory& inventory) const {
   inventory.addItems(_product, _quantity);
 }
 
@@ -14,7 +14,7 @@ void Inventory::AddItemsCommand::undo (Inventory& inventory) const {
   inventory.removeItems(_product, _quantity);
 }
 
-void Inventory::RemoveItemsCommand::execute (Inventory& inventory) const {
+void Inventory::RemoveItemsCommand::_execute (Inventory& inventory) const {
   inventory.removeItems(_product, _quantity);
 }
 

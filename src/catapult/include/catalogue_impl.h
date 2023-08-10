@@ -15,8 +15,8 @@ class CatalogueImpl: virtual public Catalogue {
     std::vector<Product> getProducts () const;
 
   protected:
-    void addProduct (const Product &product) override;
-    void addProductGroup (const ProductGroup &productGroup) override;
+    void _addProduct (const Product &product) override;
+    void _addProductGroup (const ProductGroup &productGroup) override;
 
   private:
     std::vector<Product> _products;

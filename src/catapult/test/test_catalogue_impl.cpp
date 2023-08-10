@@ -12,7 +12,7 @@ class CatalogueImplTest : public CatalogueImpl {
 TEST(TestCatalogueImpl, TestAddProduct) {
   Product mockProduct {"ProductName", 123};
   CatalogueImplTest underTest;
-  underTest.addProduct(mockProduct);
+  underTest._addProduct(mockProduct);
 }
 
 } // namespace catapult::testing
