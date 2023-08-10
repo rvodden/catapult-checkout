@@ -13,16 +13,33 @@ class MockUndoableCommand: public Undoable<Interface> {
     MOCK_METHOD (void, undo, (Interface & receiver), (const override));
 };
 
-class MockInterface1 {};
-
-class MockCommand1 : public Command<MockInterface1> {
+class MockInterface {
   public:
-    MOCK_METHOD (void, _execute, (MockInterface1& receiver), (const override));
+    MockInterface(std::string name): _name{name} {};
+    bool operator==(const MockInterface& other) const = default;
+
+  private:
+    std::string _name;
 };
 
+class MockCommand : public Command<MockInterface> {
+  public:
+    MOCK_METHOD (void, _execute, (MockInterface& receiver), (const override));
+};
+
+TEST (TestCommand, TestExecutionOfBoundCommand) {
+  MockCommand mockCommand;
+  MockInterface interface { "Interface" };
+  EXPECT_THAT(mockCommand.isBound(), IsFalse());
+  EXPECT_CALL(mockCommand, _execute(interface));
+  mockCommand.bind(interface);
+  EXPECT_THAT(mockCommand.isBound(), IsTrue());
+  mockCommand.execute(interface);
+}
+
 TEST (TestCommand, TestExecuteBindsCommand) {
-  MockCommand1 mockCommand;
-  MockInterface1 interface;
+  MockCommand mockCommand;
+  MockInterface interface { "Interface" };
   EXPECT_THAT(mockCommand.isBound(), IsFalse());
   mockCommand.execute(interface);
   EXPECT_THAT(mockCommand.isBound(), IsTrue());
@@ -35,6 +52,14 @@ TEST (TestReverseCommand, TestExecute) {
   EXPECT_CALL (*mockCommand, undo (receiver));
   underTest.execute (receiver);
 }
+
+class MockInterface1 { };
+
+class MockCommand1 : public Command<MockInterface1> {
+  public:
+    MOCK_METHOD (void, _execute, (MockInterface1& receiver), (const override));
+};
+
 
 class MockInterface2 {};
 

@@ -27,6 +27,10 @@ CheckOptions:
   readability-identifier-naming.PrivateMemberCase: camelBack
   readability-identifier-naming.PrivateMethodPrefix: _
   readability-identifier-naming.PrivateMethodCase: camelBack
+  readability-identifier-naming.ProtectedMemberPrefix: _
+  readability-identifier-naming.ProtectedMemberCase: camelBack
+  readability-identifier-naming.ProtectedMethodPrefix: _
+  readability-identifier-naming.ProtectedMethodCase: camelBack
   readability-identifier-naming.StructCase: CamelCase
   readability-identifier-naming.FunctionCase: camelBack
   readability-identifier-naming.VariableCase: camelBack

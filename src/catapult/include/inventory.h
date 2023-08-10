@@ -31,7 +31,7 @@ class Inventory {
     //! @brief add a quatity of product to the inventory
     //! @param product the product to add
     //! @param quantity the quantity to add
-    virtual void addItems(Product product, uint32_t quantity) = 0;
+    virtual void _addItems(Product product, uint32_t quantity) = 0;
 
     //! @brief remove a quatity of product to the inventory
     //! @param product the product to add
@@ -69,7 +69,7 @@ class InventoryImpl: virtual public Inventory {
     uint32_t getQuantity(Product product) const override;
 
   protected:
-    void addItems(Product product, uint32_t quantity) override;
+    void _addItems(Product product, uint32_t quantity) override;
     void removeItems(Product product, uint32_t quantity) override;
 
   private:

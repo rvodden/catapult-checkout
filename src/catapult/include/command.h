@@ -20,14 +20,18 @@ class Command {
       _execute (interface);
     };
 
+    void execute () { execute (*getTarget ()); };
+
     //! @brief associates the command with an interface instance, but does not execute it.
     void bind (Interface &interface) { _interface = &interface; }
     bool isBound () { return _interface != nullptr; }
 
   protected:
     //! @brief returns a pointer to
-    Interface* getTarget() {
-      if(_interface == nullptr) throw UnboundCommandException(*this);
+    Interface *getTarget () {
+      if (_interface == nullptr) {
+        throw UnboundCommandException (*this);
+      }
       return _interface;
     }
 
@@ -79,9 +83,7 @@ template<class Interface>
 class UndoableCommand: public Command<Interface>, public Undoable<Interface> {
   public:
     using Undoable<Interface>::undo;
-    void undo () const {
-      undo(*Command<Interface>::getTarget());
-    }
+    void undo () const { undo (*Command<Interface>::getTarget ()); }
 };
 
 template<class Interface>
