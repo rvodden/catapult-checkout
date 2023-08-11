@@ -22,11 +22,13 @@ class Command {
     virtual ~Command () = default;
     void execute (Interface &interface) { _execute (interface); };
 
-  private:
+  protected:
     virtual void _execute (Interface &receiver) const = 0;
 };
 
-template<class Interface>
+class EmptyInterface {};
+
+template<class Interface = EmptyInterface>
 class BindableCommand: public Command<Interface> {
   public:
     using Command<Interface>::execute;
@@ -48,6 +50,27 @@ class BindableCommand: public Command<Interface> {
     Interface *_interface { nullptr };
 };
 
+
+template<>
+class BindableCommand<EmptyInterface>: public Command<EmptyInterface> {
+  public:
+    ~BindableCommand () override { delete _interface; };
+
+    using Command<EmptyInterface>::execute;
+    void execute () { execute (*_getTarget ()); };
+
+    //! @brief associates the command with an interface instance, but does not execute it.
+    void bind ([[maybe_unused]] EmptyInterface &interface) {};
+    bool isBound () { return true; }
+
+  protected:
+    EmptyInterface *_getTarget () const { return _interface; }
+    void _execute ([[maybe_unused]] EmptyInterface &interface) const override { _execute (); };
+    virtual void _execute () const = 0;
+    EmptyInterface *_interface { new EmptyInterface () };
+};
+
+
 template<class Interfaces>
 using CommandPointer = std::shared_ptr<Command<Interfaces>>;
 
@@ -66,19 +89,10 @@ class Undoable {
 };
 
 template<class Interface>
-class UndoableCommand: public Command<Interface>, public Undoable<Interface> {
-};
-
-template<class Interface>
-class UndoableBindableCommand: public BindableCommand<Interface>, public Undoable<Interface> {
-  public:
-    using Undoable<Interface>::undo;
-    void undo () const { undo (*BindableCommand<Interface>::_getTarget ()); }
-};
+class UndoableCommand: public Command<Interface>, public Undoable<Interface> {};
 
 template<class Interfaces>
 using UndoableCommandPointer = std::shared_ptr<UndoableCommand<Interfaces>>;
-
 
 template<class... Interfaces>
 using UndoableCommandWrapper = std::variant<UndoableCommandPointer<Interfaces>...>;
@@ -86,6 +100,20 @@ using UndoableCommandWrapper = std::variant<UndoableCommandPointer<Interfaces>..
 //! @brief a std::list of commands each of which is targeted at one of `Interfaces`
 template<class... Interfaces>
 using UndoableCommandList = std::list<UndoableCommandWrapper<Interfaces...>>;
+
+template<class Interface = EmptyInterface>
+class UndoableBindableCommand: public BindableCommand<Interface>, public Undoable<Interface> {
+  public:
+    using Undoable<Interface>::undo;
+    void undo () const { undo (*BindableCommand<Interface>::_getTarget ()); }
+};
+
+template<>
+class UndoableBindableCommand<EmptyInterface>: public BindableCommand<EmptyInterface>, public Undoable<EmptyInterface> {
+  public:
+    using Undoable<EmptyInterface>::undo;
+    void undo () const { undo (*BindableCommand<EmptyInterface>::_getTarget ()); }
+};
 
 template<class Interfaces>
 using UndoableBindableCommandPointer = std::shared_ptr<UndoableBindableCommand<Interfaces>>;
@@ -136,9 +164,9 @@ class ReverseCommand: public Command<Interface> {
 };
 
 template<class... Interfaces>
-class Transaction {
+class Transaction: public BindableCommand<> {
   public:
-    ~Transaction () {
+    ~Transaction () override {
       while (!_beenRun.empty ()) {
         std::visit ([] (const auto &command) { command->undo (); }, _beenRun.top ());
         _beenRun.pop ();
@@ -160,15 +188,16 @@ class Transaction {
       return then (command);
     }
 
-    void execute ();
+  protected:
+    void _execute () const override;
 
   private:
-    std::stack<UndoableBindableCommandWrapper<Interfaces...>> _toRun;
-    std::stack<UndoableBindableCommandWrapper<Interfaces...>> _beenRun;
+    mutable std::stack<UndoableBindableCommandWrapper<Interfaces...>> _toRun;
+    mutable std::stack<UndoableBindableCommandWrapper<Interfaces...>> _beenRun;
 };
 
 template<class... Interfaces>
-void Transaction<Interfaces...>::execute () {
+void Transaction<Interfaces...>::_execute () const {
   while (!_toRun.empty ()) {
     auto command = _toRun.top ();
     std::visit ([] (const auto &command) { command->execute (); }, command);
