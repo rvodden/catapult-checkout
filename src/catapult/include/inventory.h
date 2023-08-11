@@ -27,6 +27,11 @@ class Inventory {
     //! @returns the quantity of product held in the inventory
     virtual uint32_t getQuantity(Product product) const = 0;
 
+    class MoveStockCommandFactory {
+      public:
+        static Transaction<Inventory> build(Inventory &source, Inventory &destination, const Product &product, uint32_t quantity);
+    };
+
   protected:
     //! @brief add a quatity of product to the inventory
     //! @param product the product to add
@@ -40,7 +45,7 @@ class Inventory {
 };
 
 //! Adds a quantity of product to the inventory on which it is executed;
-class Inventory::AddItemsCommand: public UndoableCommand<Inventory> {
+class Inventory::AddItemsCommand: public UndoableBindableCommand<Inventory> {
   public:
     AddItemsCommand(const Product& product, uint32_t quantity): _product(product), _quantity(quantity) {};
     void undo(Inventory& inventory) const override;
@@ -52,7 +57,7 @@ class Inventory::AddItemsCommand: public UndoableCommand<Inventory> {
 };
 
 //! Removes a quantity of product to the inventory on which it is executed;
-class Inventory::RemoveItemsCommand: public UndoableCommand<Inventory> {
+class Inventory::RemoveItemsCommand: public UndoableBindableCommand<Inventory> {
   public:
     RemoveItemsCommand(const Product& product, uint32_t quantity): _product(product), _quantity(quantity) {};
     void undo(Inventory& inventory) const override;
@@ -63,21 +68,6 @@ class Inventory::RemoveItemsCommand: public UndoableCommand<Inventory> {
     uint32_t _quantity;
 };
 
-//! @brief implementation of an inventory
-class InventoryImpl: virtual public Inventory {
-  public:
-    uint32_t getQuantity(Product product) const override;
-
-  protected:
-    void _addItems(Product product, uint32_t quantity) override;
-    void _removeItems(Product product, uint32_t quantity) override;
-
-  private:
-    std::unordered_map<Product, uint32_t> _inventory;
-};
-
-
 } // namespace catapult
-
 
 #endif // __INVENTORY_H__

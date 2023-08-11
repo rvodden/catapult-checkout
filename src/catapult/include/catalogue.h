@@ -65,6 +65,8 @@ std::ostream &operator<< (std::ostream &outStream, const ProductGroup &product);
 class Catalogue {
   public:
     virtual ~Catalogue() = default;
+    // virtual Product getProductByName(const std::string& name) = 0;
+
     class AddProductCommand;
     class AddProductGroupCommand;
 

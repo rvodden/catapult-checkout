@@ -14,5 +14,9 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
   SuperMarket superMarket;
   superMarket.applyCommandList (commandList);
 
+  Basket basket;
+
+  // auto buyThreeBananas = Inventory::MoveStockCommandFactory::build(superMarket, basket);
+
   return 0;
 }
