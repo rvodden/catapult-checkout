@@ -10,12 +10,14 @@
 
 namespace catapult {
 
+//! @brief thrown if a bindable command is executed, or added to a collection, before it is bound.
 class UnboundCommandException: public CatapultException {
   public:
     UnboundCommandException (): CatapultException ("The command is not bound to an interface implementation") {};
     // TODO: link to command which broke.
 };
 
+//! @brief encapsulates actions against an interface so they can be triggered by agents which may not have access to the interface
 template<class Interface>
 class Command {
   public:
@@ -26,8 +28,10 @@ class Command {
     virtual void _execute (Interface &receiver) const = 0;
 };
 
+//! @brief an interface which requires no methods.
 class EmptyInterface {};
 
+//! @brief a command which can be bound to an implementation of the required interface before it is executed
 template<class Interface = EmptyInterface>
 class BindableCommand: public Command<Interface> {
   public:
@@ -50,7 +54,7 @@ class BindableCommand: public Command<Interface> {
     Interface *_interface { nullptr };
 };
 
-
+//! @brief a specialisation of BindableCommand which does not consume an interface - used by meta commands such as `Transaction`
 template<>
 class BindableCommand<EmptyInterface>: public Command<EmptyInterface> {
   public:
@@ -67,20 +71,25 @@ class BindableCommand<EmptyInterface>: public Command<EmptyInterface> {
     EmptyInterface *_getTarget () const { return _interface; }
     void _execute ([[maybe_unused]] EmptyInterface &interface) const override { _execute (); };
     virtual void _execute () const = 0;
+
+  private:
     EmptyInterface *_interface { new EmptyInterface () };
 };
 
-
+//! @brief a pointer to a command
 template<class Interfaces>
 using CommandPointer = std::shared_ptr<Command<Interfaces>>;
 
+//! @brief an encapsulation of a command which is target at one of, potentially, many Interfaces
 template<class... Interfaces>
 using CommandWrapper = std::variant<CommandPointer<Interfaces>...>;
 
-//! @brief a std::list of commands each of which is targeted at one of `Interfaces`
+//! @brief a std::list of commands each of which is targeted at one of Interfaces
 template<class... Interfaces>
 using CommandList = std::list<CommandWrapper<Interfaces...>>;
 
+
+//! @brief encapsulation of reversing an action
 template<class Interface>
 class Undoable {
   public:
@@ -88,19 +97,23 @@ class Undoable {
     virtual void undo (Interface &receiver) const = 0;
 };
 
+//! @brief a command whos action can be reversed
 template<class Interface>
 class UndoableCommand: public Command<Interface>, public Undoable<Interface> {};
 
+//! @brief a pointer to an UndoableCommand
 template<class Interfaces>
 using UndoableCommandPointer = std::shared_ptr<UndoableCommand<Interfaces>>;
 
+//! @brief encapsulation of an UndoableCommand which may be targeted at one of many Interfaces.
 template<class... Interfaces>
 using UndoableCommandWrapper = std::variant<UndoableCommandPointer<Interfaces>...>;
 
-//! @brief a std::list of commands each of which is targeted at one of `Interfaces`
+//! @brief a std::list of commands each of which is targeted at one of many Interfaces.
 template<class... Interfaces>
 using UndoableCommandList = std::list<UndoableCommandWrapper<Interfaces...>>;
 
+//! @brief a command which can both be bound and reversed.
 template<class Interface = EmptyInterface>
 class UndoableBindableCommand: public BindableCommand<Interface>, public Undoable<Interface> {
   public:
@@ -108,6 +121,7 @@ class UndoableBindableCommand: public BindableCommand<Interface>, public Undoabl
     void undo () const { undo (*BindableCommand<Interface>::_getTarget ()); }
 };
 
+//! @brief a specialisation of UndoablBindableCommand which does not target any interface.
 template<>
 class UndoableBindableCommand<EmptyInterface>: public BindableCommand<EmptyInterface>, public Undoable<EmptyInterface> {
   public:
@@ -115,9 +129,11 @@ class UndoableBindableCommand<EmptyInterface>: public BindableCommand<EmptyInter
     void undo () const { undo (*BindableCommand<EmptyInterface>::_getTarget ()); }
 };
 
+//! @brief a pointer to an UndoableBindableCommand
 template<class Interfaces>
 using UndoableBindableCommandPointer = std::shared_ptr<UndoableBindableCommand<Interfaces>>;
 
+//! @brief an encapsulation of UndoableBindableCommands which do not target and interface.
 template<class... Interfaces>
 using UndoableBindableCommandWrapper = std::variant<UndoableBindableCommandPointer<Interfaces>...>;
 
@@ -125,7 +141,7 @@ using UndoableBindableCommandWrapper = std::variant<UndoableBindableCommandPoint
 template<class... Interfaces>
 using UndoableBindableCommandList = std::list<UndoableBindableCommandWrapper<Interfaces...>>;
 
-
+//! @brief provides the abiity for a command to be applied to an Interface.
 template<class Interface>
 class Receiver: virtual public Interface {
   public:
@@ -148,7 +164,7 @@ class MultiReceiver: public Receiver<Interface>, public Receiver<Interfaces>... 
     }
 };
 
-
+//! @brief generates a command from the reverse action of an UndoableCommand
 template<class Interface>
 class ReverseCommand: public Command<Interface> {
   public:
@@ -163,6 +179,7 @@ class ReverseCommand: public Command<Interface> {
     std::shared_ptr<Undoable<Interface>> _command;
 };
 
+//! @brief encapsulats a set of UndoableBindableCommands which can then only all succeed or all fail
 template<class... Interfaces>
 class Transaction: public BindableCommand<> {
   public:
