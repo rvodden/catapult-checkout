@@ -4,6 +4,7 @@
 #include "catalogue.h"
 #include "command.h"
 #include "exception.h"
+#include "observer.h"
 #include "renderer.h"
 
 namespace catapult
@@ -16,10 +17,22 @@ class OutOfStockException: public CatapultException {
     Product product;
 };
 
-//! @brief represents a ledger of product quantity;
-class Inventory: public Renderable<Inventory> {
+//! @brief a message which is sent to observers when a stock level changes.
+class StockChangeMessage {
   public:
-    virtual ~Inventory() = default;
+    StockChangeMessage( const Product& product, const uint32_t& newQuantity ): _product { product }, _newQuantity { newQuantity } {};
+    Product getProduct() const { return _product; };
+    uint32_t getNewQuantity() const { return _newQuantity; };
+
+  private:
+    Product _product;
+    uint32_t _newQuantity;
+};
+
+//! @brief represents a ledger of product quantity;
+class Inventory: public Renderable<Inventory>, public BaseObservable<StockChangeMessage> {
+  public:
+    ~Inventory() override = default;
     class AddItemsCommand;
     class RemoveItemsCommand;
 

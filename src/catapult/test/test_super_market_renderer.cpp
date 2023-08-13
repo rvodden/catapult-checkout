@@ -5,7 +5,7 @@
 
 #include "catalogue.h"
 #include "inventory.h"
-#include "mock/inventory.h"
+#include "mock/mock_inventory.h"
 #include "super_market_renderer.h"
 
 namespace catapult::testing {

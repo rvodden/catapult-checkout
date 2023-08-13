@@ -2,6 +2,7 @@
 #define __INVENTORY_IMPL_H__
 
 #include "inventory.h"
+#include "observer.h"
 
 namespace catapult
 {
@@ -10,7 +11,7 @@ namespace catapult
 class InventoryImpl: virtual public Inventory {
   public:
     uint32_t getQuantity(Product product) const override;
-    std::vector<Product> getProducts() const;
+    std::vector<Product> getProducts() const override;
 
   protected:
     void _addItems(Product product, uint32_t quantity) override;

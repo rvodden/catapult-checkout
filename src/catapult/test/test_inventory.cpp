@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "inventory.h"
-#include "mock/inventory.h"
+#include "mock/mock_inventory.h"
 
 namespace catapult::testing {
 

@@ -4,6 +4,7 @@ namespace catapult {
 
 void InventoryImpl::_addItems (Product product, uint32_t quantity) {
   _inventory[product] += quantity;
+  _notifyObservers(StockChangeMessage(product, _inventory[product]));
 }
 
 void InventoryImpl::_removeItems (Product product, uint32_t quantity) {
@@ -11,6 +12,7 @@ void InventoryImpl::_removeItems (Product product, uint32_t quantity) {
   if (!inStock)
     throw OutOfStockException (product);
   _inventory[product] -= quantity;
+  _notifyObservers(StockChangeMessage(product, _inventory[product]));
 }
 
 uint32_t InventoryImpl::getQuantity (Product product) const {
