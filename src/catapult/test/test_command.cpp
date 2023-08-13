@@ -132,7 +132,8 @@ TEST (TestTransact, TestAListIsRolledBackWhenOneThrows) {
     Transaction<MockInterface1, MockInterface2> transaction {};
     transaction.then<MockInterface1> (mockInterface1, mockUndoableCommand1)
       .then<MockInterface2> (mockInterface2, mockUndoableCommand2)
-      .execute ();
+      .then<MockInterface2> (mockInterface2, mockUndoableCommand3);
+    EXPECT_THAT([&](){transaction.execute ();},Throws<std::runtime_error>() );
   }
 }
 }  // namespace catapult

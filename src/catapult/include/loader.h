@@ -10,6 +10,10 @@
 
 namespace catapult {
 
+class CannotOpenFileException: public CatapultException {
+  using CatapultException::CatapultException;
+};
+
 using Record = std::vector<std::string>;
 
 //! @brief Base Class for loaders. Loads take data from somewhere and returns an istream of it;

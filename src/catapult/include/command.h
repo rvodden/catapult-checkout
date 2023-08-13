@@ -4,6 +4,7 @@
 #include <list>
 #include <memory>
 #include <stack>
+#include <queue>
 #include <variant>
 
 #include "exception.h"
@@ -17,7 +18,8 @@ class UnboundCommandException: public CatapultException {
     // TODO: link to command which broke.
 };
 
-//! @brief encapsulates actions against an interface so they can be triggered by agents which may not have access to the interface
+//! @brief encapsulates actions against an interface so they can be triggered by agents which may not have access to the
+//! interface
 template<class Interface>
 class Command {
   public:
@@ -54,7 +56,8 @@ class BindableCommand: public Command<Interface> {
     Interface *_interface { nullptr };
 };
 
-//! @brief a specialisation of BindableCommand which does not consume an interface - used by meta commands such as `Transaction`
+//! @brief a specialisation of BindableCommand which does not consume an interface - used by meta commands such as
+//! `Transaction`
 template<>
 class BindableCommand<EmptyInterface>: public Command<EmptyInterface> {
   public:
@@ -65,7 +68,7 @@ class BindableCommand<EmptyInterface>: public Command<EmptyInterface> {
 
     //! @brief associates the command with an interface instance, but does not execute it.
     void bind ([[maybe_unused]] EmptyInterface &interface) {};
-    bool isBound () { return true; }
+    static bool isBound () { return true; }
 
   protected:
     EmptyInterface *_getTarget () const { return _interface; }
@@ -184,9 +187,11 @@ template<class... Interfaces>
 class Transaction: public BindableCommand<> {
   public:
     ~Transaction () override {
-      while (!_beenRun.empty ()) {
-        std::visit ([] (const auto &command) { command->undo (); }, _beenRun.top ());
-        _beenRun.pop ();
+      if(!_committed) {
+        while (!_beenRun.empty ()) {
+          std::visit ([] (const auto &command) { command->undo (); }, _beenRun.top ());
+          _beenRun.pop ();
+        }
       }
     }
 
@@ -209,18 +214,20 @@ class Transaction: public BindableCommand<> {
     void _execute () const override;
 
   private:
-    mutable std::stack<UndoableBindableCommandWrapper<Interfaces...>> _toRun;
+    mutable std::queue<UndoableBindableCommandWrapper<Interfaces...>> _toRun;
     mutable std::stack<UndoableBindableCommandWrapper<Interfaces...>> _beenRun;
+    mutable bool _committed { false };
 };
 
 template<class... Interfaces>
 void Transaction<Interfaces...>::_execute () const {
   while (!_toRun.empty ()) {
-    auto command = _toRun.top ();
+    auto command = _toRun.front ();
     std::visit ([] (const auto &command) { command->execute (); }, command);
     _beenRun.push (command);
     _toRun.pop ();
   }
+  _committed = true;
 };
 
 }

@@ -5,11 +5,12 @@
 #include "catalogue_impl.h"
 #include "command.h"
 #include "inventory.h"
+#include "renderer.h"
 
 
 namespace catapult
 {
-class SuperMarket: public InventoryImpl, CatalogueImpl, public MultiReceiver<Catalogue, Inventory> {
+class SuperMarket: public InventoryImpl, public CatalogueImpl, public MultiReceiver<Catalogue, Inventory> {
 
 };
 

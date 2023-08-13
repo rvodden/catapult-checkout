@@ -25,8 +25,13 @@ std::vector<Record> CSVParser::parse(std::istream& dataStream) const {
   return records;
 }
 
-std::istream &FileLoader::load () const {
-  return *new std::ifstream { _path };
+std::istream& FileLoader::load () const {
+  auto fstream = new std::ifstream { _path };
+  fstream->is_open();
+  if(!fstream->is_open()) {
+    throw CannotOpenFileException("Could not open file!");
+  }
+  return *fstream;
 }
 
 }  // namespace catapult

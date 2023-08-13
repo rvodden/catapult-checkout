@@ -11,6 +11,7 @@ class MockCatalogue: public Catalogue {
   public:
     MOCK_METHOD (void, _addProduct, (const Product &product), ());
     MOCK_METHOD (void, _addProductGroup, (const ProductGroup &productGroup), ());
+    MOCK_METHOD (Product, getProductByName, (const std::string &), (override));
 };
 
 TEST (TestSuperMarket, TestAddProductCommand) {

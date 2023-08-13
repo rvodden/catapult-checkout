@@ -4,6 +4,7 @@
 #include "catalogue.h"
 #include "command.h"
 #include "exception.h"
+#include "renderer.h"
 
 namespace catapult
 {
@@ -16,7 +17,7 @@ class OutOfStockException: public CatapultException {
 };
 
 //! @brief represents a ledger of product quantity;
-class Inventory {
+class Inventory: public Renderable<Inventory> {
   public:
     virtual ~Inventory() = default;
     class AddItemsCommand;
@@ -26,6 +27,10 @@ class Inventory {
     //! @param product the product
     //! @returns the quantity of product held in the inventory
     virtual uint32_t getQuantity(Product product) const = 0;
+
+    //! @brief returns the products which are held in the inventory
+    //! @returns a std::vector of products which are held in the inventory
+    virtual std::vector<Product> getProducts() const = 0;
 
     class MoveStockCommandFactory {
       public:
