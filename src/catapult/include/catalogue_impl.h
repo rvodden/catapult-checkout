@@ -13,6 +13,7 @@ namespace catapult {
 class CatalogueImpl: virtual public Catalogue {
   public:
     std::vector<Product> getProducts () const;
+    Product getProductByName(const std::string& name) override;
 
   protected:
     void _addProduct (const Product &product) override;

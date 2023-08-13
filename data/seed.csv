@@ -11,7 +11,6 @@
 0011,Bread,2.5,Bakery,NONE,100
 0012,Donut,1.0,Bakery,THREE_FOR_TWO,75
 0013,Chocolate,2.0,Sweets,THREE_IN_GROUP,150
-0014,Candy,0.5,Sweets,THREE_FOR_TWO,200
 0015,Toothbrush,4.0,Misc,NONE,50
 0016,Soap,2.5,Misc,THREE_FOR_TWO,100
 0017,Ham,7.0,Meat,THREE_FOR_TWO,80
@@ -31,7 +30,6 @@
 0031,Croissant,2.0,Bakery,THREE_IN_GROUP,70
 0032,Bagel,1.5,Bakery,THREE_FOR_TWO,90
 0033,Candy,1.5,Sweets,THREE_FOR_TWO,200
-0034,Chocolate,2.5,Sweets,THREE_IN_GROUP,150
 0035,Tomatoes,2.0,Vegetable,NONE,80
 0036,Potatoes,3.0,Vegetable,THREE_IN_GROUP,100
 0037,Yogurt,1.5,Dairy,THREE_FOR_TWO,90
@@ -39,7 +37,6 @@
 0039,Pork,7.0,Meat,THREE_FOR_TWO,60
 0040,Lamb,9.0,Meat,THREE_IN_GROUP,50
 0041,Rum,15.0,Alcohol,THREE_FOR_TWO,40
-0042,Whiskey,20.0,Alcohol,THREE_IN_GROUP,30
 0043,Peanuts,2.5,Other,NONE,80
 0044,Biscuits,3.0,Bakery,THREE_IN_GROUP,70
 0045,Mushrooms,2.5,Vegetable,THREE_FOR_TWO,70

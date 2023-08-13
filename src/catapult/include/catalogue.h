@@ -8,6 +8,7 @@
 #include <string>
 
 #include "command.h"
+#include "exception.h"
 
 namespace catapult {
 
@@ -30,10 +31,17 @@ class std::hash<catapult::ProductGroup> {
 
 namespace catapult {
 
+//! @brief thrown if a product cannot be found
+class ProductNotFoundException: public CatapultException {
+  using CatapultException::CatapultException;
+};
+
 //! @brief represents a item which can be stocked and sold
 class Product {
   public:
     Product (const std::string &name, const uint32_t &unitCost) noexcept: _name (name), _unitCost (unitCost) {};
+    inline std::string getName() const { return _name; };
+    inline uint32_t getUnitCost() const { return _unitCost; };
 
     bool operator==(const Product&) const = default;
 
@@ -65,7 +73,7 @@ std::ostream &operator<< (std::ostream &outStream, const ProductGroup &product);
 class Catalogue {
   public:
     virtual ~Catalogue() = default;
-    // virtual Product getProductByName(const std::string& name) = 0;
+    virtual Product getProductByName(const std::string& name) = 0;
 
     class AddProductCommand;
     class AddProductGroupCommand;

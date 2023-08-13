@@ -22,4 +22,10 @@ uint32_t InventoryImpl::getQuantity (Product product) const {
   }
 }
 
+std::vector<Product> InventoryImpl::getProducts () const {
+    std::vector<Product> products;
+    std::transform(_inventory.begin(), _inventory.end(), std::back_inserter(products), [](auto pair){return pair.first;});
+    return products;
+}
+
 } // namespace catapult

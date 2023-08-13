@@ -2,7 +2,6 @@
     "name": "GCC (Linux)",
     "image": "rvodden/ha-dev:x86_64-pc-ubuntu-x11-gcc",
     "remoteUser": "root",
-    "runArgs": ["--device=/dev/dri/card0", "--cap-add=CAP_PERFMON"],
     "customizations": {
         "vscode": {
 			// Set *default* container specific settings.json values on container create.

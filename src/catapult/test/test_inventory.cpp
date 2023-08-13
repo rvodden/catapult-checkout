@@ -2,17 +2,11 @@
 #include <gtest/gtest.h>
 
 #include "inventory.h"
+#include "mock/inventory.h"
 
 namespace catapult::testing {
 
 using namespace ::testing;
-
-class MockInventory: public Inventory {
-  public:
-    MOCK_METHOD (void, _addItems, (Product product, uint32_t Quantity), ());
-    MOCK_METHOD (void, _removeItems, (Product product, uint32_t Quantity), ());
-    MOCK_METHOD (uint32_t, getQuantity, (Product product), (const));
-};
 
 TEST (TestInventory, TestAddProductCommand) {
   MockInventory mockInventory {};
