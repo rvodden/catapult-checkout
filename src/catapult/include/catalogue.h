@@ -44,6 +44,7 @@ class Product {
     inline uint32_t getUnitCost() const { return _unitCost; };
 
     bool operator==(const Product&) const = default;
+    bool operator<(const Product& other) const { return _unitCost < other._unitCost; };
 
     friend std::ostream &operator<< (std::ostream &outStream, const Product &product);
     friend std::size_t std::hash<Product>::operator()(const Product& product) const noexcept;
