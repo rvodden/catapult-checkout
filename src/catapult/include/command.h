@@ -61,7 +61,12 @@ class BindableCommand: public Command<Interface> {
 template<>
 class BindableCommand<EmptyInterface>: public Command<EmptyInterface> {
   public:
+    // BindableCommand(const BindableCommand&) = default;
+    // BindableCommand(BindableCommand&&) = default;
     ~BindableCommand () override { delete _interface; };
+
+    // BindableCommand& operator=(const BindableCommand&) = default;
+    // BindableCommand& operator=(BindableCommand&&) = default;
 
     using Command<EmptyInterface>::execute;
     void execute () { execute (*_getTarget ()); };
