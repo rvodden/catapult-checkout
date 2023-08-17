@@ -25,6 +25,10 @@ void MultiplePurchaseDeal::notify (StockChangeMessage stockChangeMessage) {
   _eligableProducts.at (stockChangeMessage.getProduct ()) = stockChangeMessage.getNewQuantity ();
 }
 
+std::vector<Product> MultiplePurchaseDeal::getEligableProducts () const {
+  return getKeys(_eligableProducts);
+}
+
 std::vector<std::shared_ptr<Discount>> MultiplePurchaseDeal::getDiscounts () const {
   auto numberOfProductsRemainingToDiscount = size () / _multiplicity;
   std::vector<std::shared_ptr<Discount>> discounts;

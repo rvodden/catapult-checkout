@@ -38,15 +38,22 @@ class Deal {
     virtual std::vector<std::shared_ptr<Discount>> getDiscounts () const = 0;
 };
 
+
+//! @brief represents a Deal which applies to one or more products
+class ProductDeal: Deal {
+  public:
+    virtual std::vector<Product> getEligableProducts() const = 0;
+};
+
 //! @brief reprensents a means of calculating discounts on the basis of observed StockChangeMessages
-class MultiplePurchaseDeal: public Deal, public Observer<StockChangeMessage> {
+class MultiplePurchaseDeal: public ProductDeal, public Observer<StockChangeMessage> {
   public:
     //! @brief constructor
     //! @param eligableProducts a vector of products for which this discount is eligable
     MultiplePurchaseDeal (const std::vector<Product> &eligableProducts);
 
-
     void notify (StockChangeMessage) override;
+    std::vector<Product> getEligableProducts() const override;
     std::vector<std::shared_ptr<Discount>> getDiscounts () const override;
 
   protected:
@@ -65,13 +72,13 @@ class DealRegistry {
     virtual ~DealRegistry () = default;
 
     //! @brief returns a vector of deals associated with a product
-    virtual std::vector<std::shared_ptr<Deal>> getDeals (const Product &product) const = 0;
+    virtual std::vector<std::shared_ptr<ProductDeal>> getDeals (const Product &product) const = 0;
 
     template<class ConcreteDeal>
     class RegisterDealCommand;
 
   protected:
-    virtual void _registerDeal (std::shared_ptr<Deal> deal) = 0;
+    virtual void _registerDeal (std::shared_ptr<ProductDeal> deal) = 0;
 };
 
 
