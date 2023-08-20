@@ -52,7 +52,10 @@ constexpr auto kTestData = "This is some test data\n"sv;
 class TestFileLoader: public Test {
   public:
     void SetUp () {
-      _path = std::tmpnam (nullptr);
+      char filename[] = "/tmp/mytemp.XXXXXX";
+      int fileDescriptor = mkstemp(filename);
+      close(fileDescriptor);
+      _path = std::filesystem::path(filename);
       std::ofstream tmpFile { _path };
       tmpFile << kTestData << std::flush;
     }

@@ -71,7 +71,10 @@ const std::string kTestData = R"T(0001,Apple,1.0,Fruit,THREE_FOR_TWO,100
 class TestCSVFileInventoryImporter: public Test {
   public:
     void SetUp () override {
-      _path = std::tmpnam (nullptr);
+      char filename[] = "/tmp/mytemp.XXXXXX";
+      int fileDescriptor = mkstemp(filename);
+      close(fileDescriptor);
+      _path = std::filesystem::path(filename);
       std::ofstream tmpFile { _path };
       tmpFile << kTestData << std::flush;
     }

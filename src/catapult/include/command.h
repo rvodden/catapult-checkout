@@ -61,12 +61,26 @@ class BindableCommand: public Command<Interface> {
 template<>
 class BindableCommand<EmptyInterface>: public Command<EmptyInterface> {
   public:
-    // BindableCommand(const BindableCommand&) = default;
-    // BindableCommand(BindableCommand&&) = default;
+    BindableCommand() = default;
+    BindableCommand(const BindableCommand& other) = default;
+
+    BindableCommand(BindableCommand&& other) noexcept : _interface { other._interface } {
+      other._interface = new EmptyInterface();
+    };
+
     ~BindableCommand () override { delete _interface; };
 
-    // BindableCommand& operator=(const BindableCommand&) = default;
-    // BindableCommand& operator=(BindableCommand&&) = default;
+    BindableCommand& operator=(const BindableCommand& other){
+      _interface = other._interface;
+      return *this;
+    };
+
+    BindableCommand& operator=(BindableCommand&& other) noexcept {
+      delete _interface;
+      _interface = other._interface;
+      other._interface = new EmptyInterface();
+      return *this;
+    };
 
     using Command<EmptyInterface>::execute;
     void execute () { execute (*_getTarget ()); };
@@ -191,6 +205,33 @@ class ReverseCommand: public Command<Interface> {
 template<class... Interfaces>
 class Transaction: public BindableCommand<> {
   public:
+    Transaction() = default;
+
+    // Copy must empty _beenRun, as otherwise commands may
+    // be rolled back twice.
+    Transaction(const Transaction& other): _commands { other._commands }, _beenRun { } {
+    }
+
+    Transaction& operator=(const Transaction& other) {
+      _commands = other._commands;
+      _beenRun = {};
+      return *this;
+    }
+
+    // Move must empty _beenRun on other, otherwise
+    // commands may be rolled back twice
+    Transaction(Transaction&& other) noexcept : _commands { other._commands }, _beenRun { other._beenRun } {
+    }
+
+    Transaction& operator=(Transaction&& other) noexcept {
+      _commands = other._commands;
+      _beenRun = other._beenRun;
+      other._commands = {};
+      other._beenRun = {};
+      return *this;
+    }
+
+
     ~Transaction () override {
       if(!_committed) {
         while (!_beenRun.empty ()) {
@@ -205,7 +246,7 @@ class Transaction: public BindableCommand<> {
       if (!command->isBound ()) {
         throw UnboundCommandException ();
       }
-      _toRun.push (command);
+      _commands.push_back (command);
       return *this;
     }
 
@@ -219,18 +260,16 @@ class Transaction: public BindableCommand<> {
     void _execute () const override;
 
   private:
-    mutable std::queue<UndoableBindableCommandWrapper<Interfaces...>> _toRun;
+    mutable std::vector<UndoableBindableCommandWrapper<Interfaces...>> _commands;
     mutable std::stack<UndoableBindableCommandWrapper<Interfaces...>> _beenRun;
     mutable bool _committed { false };
 };
 
 template<class... Interfaces>
 void Transaction<Interfaces...>::_execute () const {
-  while (!_toRun.empty ()) {
-    auto command = _toRun.front ();
+  for ( auto& command : _commands ) {
     std::visit ([] (const auto &command) { command->execute (); }, command);
     _beenRun.push (command);
-    _toRun.pop ();
   }
   _committed = true;
 };

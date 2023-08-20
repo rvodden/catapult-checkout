@@ -1,5 +1,5 @@
 {
-    "name": "GCC",
+    "name": "GCC (Windows)",
     "image": "rvodden/ha-dev:x86_64-pc-ubuntu-x11-gcc",
     "remoteUser": "hadev",
     "runArgs": ["--device=/dev/dri/card0", "--cap-add=CAP_PERFMON"],
