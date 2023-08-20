@@ -27,7 +27,7 @@ class Command {
     void execute (Interface &interface) { _execute (interface); };
 
   protected:
-    virtual void _execute (Interface &receiver) const = 0;
+    virtual void _execute (Interface &receiver) = 0;
 };
 
 //! @brief an interface which requires no methods.
@@ -91,8 +91,8 @@ class BindableCommand<EmptyInterface>: public Command<EmptyInterface> {
 
   protected:
     EmptyInterface *_getTarget () const { return _interface; }
-    void _execute ([[maybe_unused]] EmptyInterface &interface) const override { _execute (); };
-    virtual void _execute () const = 0;
+    void _execute ([[maybe_unused]] EmptyInterface &interface) override { _execute (); };
+    virtual void _execute () = 0;
 
   private:
     EmptyInterface *_interface { new EmptyInterface () };
@@ -116,7 +116,7 @@ template<class Interface>
 class Undoable {
   public:
     virtual ~Undoable () = default;
-    virtual void undo (Interface &receiver) const = 0;
+    virtual void undo (Interface &receiver) = 0;
 };
 
 //! @brief a command whos action can be reversed
@@ -140,7 +140,7 @@ template<class Interface = EmptyInterface>
 class UndoableBindableCommand: public BindableCommand<Interface>, public Undoable<Interface> {
   public:
     using Undoable<Interface>::undo;
-    void undo () const { undo (*BindableCommand<Interface>::_getTarget ()); }
+    void undo () { undo (*BindableCommand<Interface>::_getTarget ()); }
 };
 
 //! @brief a specialisation of UndoablBindableCommand which does not target any interface.
@@ -148,7 +148,7 @@ template<>
 class UndoableBindableCommand<EmptyInterface>: public BindableCommand<EmptyInterface>, public Undoable<EmptyInterface> {
   public:
     using Undoable<EmptyInterface>::undo;
-    void undo () const { undo (*BindableCommand<EmptyInterface>::_getTarget ()); }
+    void undo () { undo (*BindableCommand<EmptyInterface>::_getTarget ()); }
 };
 
 //! @brief a pointer to an UndoableBindableCommand
@@ -195,7 +195,7 @@ class ReverseCommand: public Command<Interface> {
     ReverseCommand &operator= (ReverseCommand &) = delete;
     virtual ~ReverseCommand () = default;
 
-    void _execute (Interface &receiver) const override { _command->undo (receiver); };
+    void _execute (Interface &receiver) override { _command->undo (receiver); };
 
   private:
     std::shared_ptr<Undoable<Interface>> _command;
@@ -257,16 +257,16 @@ class Transaction: public BindableCommand<> {
     }
 
   protected:
-    void _execute () const override;
+    void _execute () override;
 
   private:
-    mutable std::vector<UndoableBindableCommandWrapper<Interfaces...>> _commands;
-    mutable std::stack<UndoableBindableCommandWrapper<Interfaces...>> _beenRun;
-    mutable bool _committed { false };
+    std::vector<UndoableBindableCommandWrapper<Interfaces...>> _commands;
+    std::stack<UndoableBindableCommandWrapper<Interfaces...>> _beenRun;
+    bool _committed { false };
 };
 
 template<class... Interfaces>
-void Transaction<Interfaces...>::_execute () const {
+void Transaction<Interfaces...>::_execute () {
   for ( auto& command : _commands ) {
     std::visit ([] (const auto &command) { command->execute (); }, command);
     _beenRun.push (command);

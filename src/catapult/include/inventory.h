@@ -66,10 +66,10 @@ class Inventory: public Renderable<Inventory>, public BaseObservable<StockChange
 class Inventory::AddItemsCommand: public UndoableBindableCommand<Inventory> {
   public:
     AddItemsCommand(const Product& product, uint32_t quantity): _product(product), _quantity(quantity) {};
-    void undo(Inventory& inventory) const override;
+    void undo(Inventory& inventory) override;
 
   private:
-    void _execute(Inventory& inventory) const override;
+    void _execute(Inventory& inventory) override;
     Product _product;
     uint32_t _quantity;
 };
@@ -78,10 +78,10 @@ class Inventory::AddItemsCommand: public UndoableBindableCommand<Inventory> {
 class Inventory::RemoveItemsCommand: public UndoableBindableCommand<Inventory> {
   public:
     RemoveItemsCommand(const Product& product, uint32_t quantity): _product(product), _quantity(quantity) {};
-    void undo(Inventory& inventory) const override;
+    void undo(Inventory& inventory) override;
 
   private:
-    void _execute(Inventory& inventory) const override;
+    void _execute(Inventory& inventory) override;
     Product _product;
     uint32_t _quantity;
 };

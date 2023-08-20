@@ -89,7 +89,7 @@ class Catalogue::AddProductCommand: public Command<Catalogue> {
     AddProductCommand (const Product& product): _product(product) {};
 
   private:
-    void _execute (Catalogue &catalogue) const override;
+    void _execute (Catalogue &catalogue) override;
     Product _product;
 };
 
@@ -98,7 +98,7 @@ class Catalogue::AddProductGroupCommand: public Command<Catalogue> {
     AddProductGroupCommand (const ProductGroup& productGroup): _productGroup(productGroup) {};
 
   private:
-    void _execute (Catalogue &catalogue) const override;
+    void _execute (Catalogue &catalogue) override;
     ProductGroup _productGroup;
 };
 

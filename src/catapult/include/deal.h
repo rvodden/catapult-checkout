@@ -89,7 +89,7 @@ class DealRegistry::RegisterDealCommand: public Command<DealRegistry> {
     RegisterDealCommand (ConcreteDeal deal): _deal { deal } {};
 
   protected:
-    void _execute (DealRegistry &dealRegistry) const override {
+    void _execute (DealRegistry &dealRegistry) override {
       dealRegistry._registerDeal(std::make_shared<ConcreteDeal>(_deal));
     };
 

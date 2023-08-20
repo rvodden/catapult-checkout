@@ -10,7 +10,7 @@ using namespace ::testing;
 template<class Interface>
 class MockUndoableCommand: public Undoable<Interface> {
   public:
-    MOCK_METHOD (void, undo, (Interface & receiver), (const override));
+    MOCK_METHOD (void, undo, (Interface & receiver), (override));
 };
 
 class MockInterface {
@@ -24,7 +24,7 @@ class MockInterface {
 
 class MockBindableCommand: public BindableCommand<MockInterface> {
   public:
-    MOCK_METHOD (void, _execute, (MockInterface & receiver), (const override));
+    MOCK_METHOD (void, _execute, (MockInterface & receiver), (override));
 };
 
 TEST (TestBindableCommand, TestExecutionOfBoundCommand) {
@@ -51,7 +51,7 @@ class MockInterface1 {};
 
 class MockCommand1: public Command<MockInterface1> {
   public:
-    MOCK_METHOD (void, _execute, (MockInterface1 & receiver), (const override));
+    MOCK_METHOD (void, _execute, (MockInterface1 & receiver), (override));
 };
 
 
@@ -61,7 +61,7 @@ class UnderTestMultiReceiver: public MultiReceiver<MockInterface1, MockInterface
 
 class MockCommand2: public Command<MockInterface2> {
   public:
-    MOCK_METHOD (void, _execute, (MockInterface2 & receiver), (const override));
+    MOCK_METHOD (void, _execute, (MockInterface2 & receiver), (override));
 };
 
 TEST (TestMultiReceiver, TestExecuteCommandList) {
@@ -86,14 +86,14 @@ TEST (TestMultiReceiver, TestExecuteCommandListAimedAtASubsetOfInterfaces) {
 
 class MockUndoableBindableCommand1: public UndoableBindableCommand<MockInterface1> {
   public:
-    MOCK_METHOD (void, _execute, (MockInterface1 & interface), (const override));
-    MOCK_METHOD (void, undo, (MockInterface1 & interface), (const override));
+    MOCK_METHOD (void, _execute, (MockInterface1 & interface), (override));
+    MOCK_METHOD (void, undo, (MockInterface1 & interface), (override));
 };
 
 class MockUndoableBindableCommand2: public UndoableBindableCommand<MockInterface2> {
   public:
-    MOCK_METHOD (void, _execute, (MockInterface2 & interface), (const override));
-    MOCK_METHOD (void, undo, (MockInterface2 & interface), (const override));
+    MOCK_METHOD (void, _execute, (MockInterface2 & interface), (override));
+    MOCK_METHOD (void, undo, (MockInterface2 & interface), (override));
 };
 
 TEST (TestTransact, TestAList) {
@@ -112,8 +112,8 @@ TEST (TestTransact, TestAList) {
 
 class MockUndoableBindableCommand3: public UndoableBindableCommand<MockInterface2> {
   public:
-    MOCK_METHOD (void, _execute, (MockInterface2 & interface), (const override));
-    MOCK_METHOD (void, undo, (MockInterface2 & interface), (const override));
+    MOCK_METHOD (void, _execute, (MockInterface2 & interface), (override));
+    MOCK_METHOD (void, undo, (MockInterface2 & interface), (override));
 };
 
 TEST (TestTransact, TestAListIsRolledBackWhenOneThrows) {

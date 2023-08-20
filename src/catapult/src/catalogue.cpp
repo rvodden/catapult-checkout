@@ -14,7 +14,7 @@ std::size_t std::hash<catapult::ProductGroup>::operator() (const catapult::Produ
 
 namespace catapult {
 
-void Catalogue::AddProductCommand::_execute (Catalogue &catalogue) const {
+void Catalogue::AddProductCommand::_execute (Catalogue &catalogue) {
   catalogue._addProduct (_product);
 }
 
@@ -28,7 +28,7 @@ std::ostream &operator<< (std::ostream &outStream, const ProductGroup &productGr
   return outStream;
 };
 
-void Catalogue::AddProductGroupCommand::_execute (Catalogue &catalogue) const {
+void Catalogue::AddProductGroupCommand::_execute (Catalogue &catalogue) {
   catalogue._addProductGroup (_productGroup);
 }
 

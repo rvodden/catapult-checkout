@@ -4,19 +4,19 @@
 
 namespace catapult {
 
-void Inventory::AddItemsCommand::_execute (Inventory &inventory) const {
+void Inventory::AddItemsCommand::_execute (Inventory &inventory) {
   inventory._addItems (_product, _quantity);
 }
 
-void Inventory::AddItemsCommand::undo (Inventory &inventory) const {
+void Inventory::AddItemsCommand::undo (Inventory &inventory) {
   inventory._removeItems (_product, _quantity);
 }
 
-void Inventory::RemoveItemsCommand::_execute (Inventory &inventory) const {
+void Inventory::RemoveItemsCommand::_execute (Inventory &inventory) {
   inventory._removeItems (_product, _quantity);
 }
 
-void Inventory::RemoveItemsCommand::undo (Inventory &inventory) const {
+void Inventory::RemoveItemsCommand::undo (Inventory &inventory) {
   inventory._addItems (_product, _quantity);
 }
 
