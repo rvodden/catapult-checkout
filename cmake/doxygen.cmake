@@ -21,5 +21,5 @@ FetchContent_Declare(_doxygen_theme
 FetchContent_MakeAvailable(_doxygen_theme)
 set(DOXYGEN_HTML_EXTRA_STYLESHEET ${DOXYGEN_HTML_EXTRA_STYLESHEET} "${_doxygen_theme_SOURCE_DIR}/doxygen-awesome-sidebar-only.css")
 
-doxygen_add_docs(doxygen-docs ALL "${CMAKE_SOURCE_DIR}/src"
+doxygen_add_docs(doxygen-docs ALL "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/README.md"
                    COMMENT "Generating documentation - entry file: ${CMAKE_CURRENT_BINARY_DIR}/html/index.html")

@@ -163,6 +163,7 @@ endmacro()
 
 macro(standard_build)
     # set(HA_TARGET_DEBUG_OPTIONS -fsanitize=address -static-libasan)
+    add_compile_options(-fdiagnostics-color=always)
     generateLibraryName(${CMAKE_CURRENT_SOURCE_DIR})
     generateObjectName(${CMAKE_CURRENT_SOURCE_DIR})
     generateStaticName(${CMAKE_CURRENT_SOURCE_DIR})
