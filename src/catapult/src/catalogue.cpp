@@ -10,6 +10,12 @@ std::size_t std::hash<catapult::ProductGroup>::operator() (const catapult::Produ
   return std::hash<std::string> {}(productGroup._name);
 }
 
+std::size_t std::hash<std::reference_wrapper<catapult::ProductGroup>>::operator() (
+  const std::reference_wrapper<const catapult::ProductGroup> &productGroup
+) const noexcept {
+  return std::hash<std::string> {}(productGroup.get ()._name);
+}
+
 }
 
 namespace catapult {
@@ -30,6 +36,10 @@ std::ostream &operator<< (std::ostream &outStream, const ProductGroup &productGr
 
 void Catalogue::AddProductGroupCommand::_execute (Catalogue &catalogue) {
   catalogue._addProductGroup (_productGroup);
+}
+
+void Catalogue::AddProductToGroupCommand::_execute (Catalogue &catalogue) {
+  catalogue._addProductToGroup (_product, _productGroup);
 }
 
 }  // namespace catapult

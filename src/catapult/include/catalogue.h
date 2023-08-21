@@ -29,10 +29,21 @@ class std::hash<catapult::ProductGroup> {
     std::size_t operator()(const catapult::ProductGroup& productGroup) const noexcept;
 };
 
+template<>
+class std::hash<std::reference_wrapper<catapult::ProductGroup>> {
+  public:
+    std::size_t operator()(const std::reference_wrapper<const catapult::ProductGroup>& productGroup) const noexcept;
+};
+
 namespace catapult {
 
 //! @brief thrown if a product cannot be found
 class ProductNotFoundException: public CatapultException {
+  using CatapultException::CatapultException;
+};
+
+//! @brief thrown if a product cannot be found
+class ProductGroupNotFoundException: public CatapultException {
   using CatapultException::CatapultException;
 };
 
@@ -63,7 +74,10 @@ class ProductGroup {
 
     bool operator==(const ProductGroup&) const = default;
     friend std::ostream &operator<< (std::ostream &outStream, const ProductGroup &product);
-    friend std::size_t std::hash<ProductGroup>::operator()(const ProductGroup& group) const noexcept;
+    friend std::size_t std::hash<ProductGroup>::operator()(const ProductGroup& productGroup) const noexcept;
+    friend std::size_t std::hash<std::reference_wrapper<ProductGroup>>::operator()(
+      const std::reference_wrapper<const ProductGroup>& productGroup
+    ) const noexcept;
   private:
     std::string _name;
 };
@@ -74,14 +88,17 @@ std::ostream &operator<< (std::ostream &outStream, const ProductGroup &product);
 class Catalogue {
   public:
     virtual ~Catalogue() = default;
-    virtual Product getProductByName(const std::string& name) = 0;
+    virtual Product getProductByName(const std::string& name) const = 0;
+    virtual std::vector<std::reference_wrapper<const Product>> getProductsInProductGroup(const ProductGroup& productGroup) const = 0;
 
     class AddProductCommand;
     class AddProductGroupCommand;
+    class AddProductToGroupCommand;
 
   private:
     virtual void _addProduct (const Product &product) = 0;
     virtual void _addProductGroup (const ProductGroup &productGroup) = 0;
+    virtual void _addProductToGroup (const Product &product, const ProductGroup &productGroup) = 0;
 };
 
 class Catalogue::AddProductCommand: public Command<Catalogue> {
@@ -102,8 +119,17 @@ class Catalogue::AddProductGroupCommand: public Command<Catalogue> {
     ProductGroup _productGroup;
 };
 
-}  // namespace catapult
+class Catalogue::AddProductToGroupCommand: public Command<Catalogue> {
+  public:
+    AddProductToGroupCommand (const Product& product, const ProductGroup& productGroup): _product {product}, _productGroup(productGroup) {};
 
+  private:
+    void _execute (Catalogue &catalogue) override;
+    Product _product;
+    ProductGroup _productGroup;
+};
+
+}  // namespace catapult
 
 
 #endif  // __CATALOGUE_H__

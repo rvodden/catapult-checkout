@@ -15,7 +15,7 @@ MultiplePurchaseDeal::MultiplePurchaseDeal (const std::vector<Product> &products
   std::ranges::for_each (products, [&] (const auto &product) { _eligableProducts[product] = 0; });
 };
 
-uint32_t MultiplePurchaseDeal::size () const {
+uint32_t MultiplePurchaseDeal::_size () const {
   return std::accumulate (_eligableProducts.begin (), _eligableProducts.end (), 0, [] (auto left, auto right) {
     return left + right.second;
   });
@@ -30,7 +30,7 @@ std::vector<Product> MultiplePurchaseDeal::getEligableProducts () const {
 }
 
 std::vector<std::shared_ptr<Discount>> MultiplePurchaseDeal::getDiscounts () const {
-  auto numberOfProductsRemainingToDiscount = size () / _multiplicity;
+  auto numberOfProductsRemainingToDiscount = _size () / _multiplicity;
   std::vector<std::shared_ptr<Discount>> discounts;
 
   for (const auto &[product, quantity]: _eligableProducts) {

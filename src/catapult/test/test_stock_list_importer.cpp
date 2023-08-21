@@ -22,7 +22,9 @@ class MockStockHolder: public MultiReceiver<Catalogue, Inventory> {
   public:
     MOCK_METHOD (void, _addProduct, (const Product &), (override));
     MOCK_METHOD (void, _addProductGroup, (const ProductGroup &), (override));
-    MOCK_METHOD (Product, getProductByName, (const std::string &), (override));
+    MOCK_METHOD (void, _addProductToGroup, (const Product&, const ProductGroup &), (override));
+    MOCK_METHOD (Product, getProductByName, (const std::string &), (const override));
+    MOCK_METHOD (std::vector<std::reference_wrapper<const Product>>, getProductsInProductGroup, (const ProductGroup &), (const override));
     MOCK_METHOD (void, _addItems, (Product, uint32_t quantity), (override));
     MOCK_METHOD (void, _removeItems, (Product, uint32_t quantity), (override));
     MOCK_METHOD (uint32_t, getQuantity, (Product), (const override));
@@ -87,14 +89,23 @@ class TestCSVFileInventoryImporter: public Test {
 
 TEST_F (TestCSVFileInventoryImporter, TestCSVFileInventoryImporter) {
   MockStockHolder mockStockHolder {};
-  EXPECT_CALL (mockStockHolder, _addProduct (Product ("Apple", 100)));
-  EXPECT_CALL (mockStockHolder, _addProduct (Product ("Banana", 50)));
-  EXPECT_CALL (mockStockHolder, _addProduct (Product ("Milk", 250)));
-  EXPECT_CALL (mockStockHolder, _addProductGroup (ProductGroup ("Fruit")));
-  EXPECT_CALL (mockStockHolder, _addProductGroup (ProductGroup ("Dairy")));
-  EXPECT_CALL (mockStockHolder, _addItems (Product ("Apple", 100),100));
-  EXPECT_CALL (mockStockHolder, _addItems (Product ("Banana", 50),150));
-  EXPECT_CALL (mockStockHolder, _addItems (Product ("Milk", 250),200));
+  auto apple = Product("Apple", 100);
+  auto banana = Product("Banana", 50);
+  auto milk = Product("Milk", 250);
+
+  auto fruit = ProductGroup("Fruit");
+  auto dairy = ProductGroup("Dairy");
+  EXPECT_CALL (mockStockHolder, _addProduct (apple));
+  EXPECT_CALL (mockStockHolder, _addProduct (banana));
+  EXPECT_CALL (mockStockHolder, _addProduct (milk));
+  EXPECT_CALL (mockStockHolder, _addProductGroup (fruit));
+  EXPECT_CALL (mockStockHolder, _addProductGroup (dairy));
+  EXPECT_CALL (mockStockHolder, _addItems (apple,100));
+  EXPECT_CALL (mockStockHolder, _addItems (banana,150));
+  EXPECT_CALL (mockStockHolder, _addItems (milk,200));
+  EXPECT_CALL (mockStockHolder, _addProductToGroup (apple, fruit));
+  EXPECT_CALL (mockStockHolder, _addProductToGroup (banana, fruit));
+  EXPECT_CALL (mockStockHolder, _addProductToGroup (milk, dairy));
 
   CSVFileInventoryImporter underTest { _path };
   auto commandList = underTest.import ();

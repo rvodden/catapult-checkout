@@ -52,13 +52,13 @@ class MultiplePurchaseDeal: public ProductDeal, public Observer<StockChangeMessa
     //! @param eligableProducts a vector of products for which this discount is eligable
     MultiplePurchaseDeal (const std::vector<Product> &eligableProducts);
 
-    void notify (StockChangeMessage) override;
+    void notify (StockChangeMessage stockChangeMessage) override;
     std::vector<Product> getEligableProducts() const override;
     std::vector<std::shared_ptr<Discount>> getDiscounts () const override;
 
   protected:
     //! @brief returns the total number of products which are eligable for discount in this instance
-    uint32_t size () const;
+    uint32_t _size () const;
 
   private:
     std::unordered_map<Product, uint32_t> _eligableProducts;

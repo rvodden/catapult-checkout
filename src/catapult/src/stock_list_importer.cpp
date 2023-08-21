@@ -31,10 +31,12 @@ const std::unordered_map<StockListInterpreter::fields, uint8_t> StockListInterpr
   CommandList<Catalogue, Inventory> commands {};
   std::unordered_map<Product, uint32_t> products;
   std::unordered_set<ProductGroup> productGroups;
+  CommandList<Catalogue, Inventory> groupPopulationCommands {};
   for (const auto &record: records) {
     auto [product, productGroup, quantity] = _interpreter->interpret (record);
     products[product] += quantity;
     productGroups.insert (productGroup);
+    groupPopulationCommands.push_back(std::make_shared<Catalogue::AddProductToGroupCommand> (product, productGroup));
   }
 
   for (const auto &productGroup: productGroups) {
@@ -45,6 +47,12 @@ const std::unordered_map<StockListInterpreter::fields, uint8_t> StockListInterpr
     commands.push_back(std::make_shared<Catalogue::AddProductCommand> (product));
     commands.push_back(std::make_shared<Inventory::AddItemsCommand> (product, quantity));
   }
+
+  commands.insert(
+    commands.end(),
+    std::make_move_iterator(groupPopulationCommands.begin()),
+    std::make_move_iterator(groupPopulationCommands.end())
+    );
   return commands;
 };
 

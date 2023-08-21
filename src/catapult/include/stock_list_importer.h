@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <variant>
 
+#include "deal.h"
 #include "catalogue.h"
 #include "command.h"
 #include "inventory.h"
@@ -14,7 +15,7 @@
 
 namespace catapult {
 
-using StockListRecord = std::tuple<Product,ProductGroup, uint32_t>;
+using StockListRecord = std::tuple<Product,ProductGroup,uint32_t>;
 
 class StockListInterpreter: public Interpreter<StockListRecord> {
   public:

@@ -1,6 +1,7 @@
 #ifndef __SUPER_MARKET_H__
 #define __SUPER_MARKET_H__
 
+#include "deal_impl.h"
 #include "inventory_impl.h"
 #include "catalogue_impl.h"
 #include "command.h"

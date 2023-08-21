@@ -8,7 +8,9 @@
         "optional": "cpp",
         "string_view": "cpp",
         "system_error": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "stdexcept": "cpp"
     },
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    "cmake.buildTask": true
 }
