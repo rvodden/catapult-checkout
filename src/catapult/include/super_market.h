@@ -11,7 +11,7 @@
 
 namespace catapult
 {
-class SuperMarket: public InventoryImpl, public CatalogueImpl, public MultiReceiver<Catalogue, Inventory> {
+class SuperMarket: public InventoryImpl, public CatalogueImpl, public DealRegistryImpl, public MultiReceiver<Catalogue, Inventory> {
 
 };
 

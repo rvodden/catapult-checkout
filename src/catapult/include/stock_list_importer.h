@@ -25,6 +25,9 @@ class StockListInterpreter: public Interpreter<StockListRecord> {
     enum class fields { kReference, kName, kUnitPrice, kProductGroup, kDealType, kQuantity };
     using enum fields;
 
+    enum class deals { kThreeForTwo, kThreeInAGroup };
+    using enum deals;
+
     static const std::unordered_map<fields, uint8_t> kFieldColumnMap;
 };
 

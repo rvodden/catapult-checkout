@@ -27,11 +27,13 @@ const std::unordered_map<StockListInterpreter::fields, uint8_t> StockListInterpr
 };
 
 [[nodiscard]] CommandList<Catalogue, Inventory> StockListImporter::import () const {
+
   auto records = _parser->parse (_loader->load ());
   CommandList<Catalogue, Inventory> commands {};
   std::unordered_map<Product, uint32_t> products;
   std::unordered_set<ProductGroup> productGroups;
   CommandList<Catalogue, Inventory> groupPopulationCommands {};
+
   for (const auto &record: records) {
     auto [product, productGroup, quantity] = _interpreter->interpret (record);
     products[product] += quantity;
@@ -52,7 +54,8 @@ const std::unordered_map<StockListInterpreter::fields, uint8_t> StockListInterpr
     commands.end(),
     std::make_move_iterator(groupPopulationCommands.begin()),
     std::make_move_iterator(groupPopulationCommands.end())
-    );
+  );
+
   return commands;
 };
 
